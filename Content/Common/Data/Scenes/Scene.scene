@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<resource _id="1">
+	<attributes>
+		<attribute name="Next Node ID" type="Int" value="8" />
+		<attribute name="Next Component ID" type="Int" value="19" />
+	</attributes>
+	<components>
+		<component _id="1" _typeName="Octree" />
+		<component _id="2" _typeName="RenderPipeline">
+			<attributes>
+				<attribute name="Color Space" type="String" value="HDR Linear" />
+				<attribute name="PCF Kernel Size" type="Int" value="5" />
+				<attribute name="Post Process Antialiasing" type="String" value="FXAA3" />
+			</attributes>
+		</component>
+		<component _id="11" _typeName="ReflectionProbeManager" />
+	</components>
+	<nodes>
+		<node _id="2">
+			<attributes>
+				<attribute name="Name" type="String" value="Skybox" />
+				<attribute name="Scale" type="Vector3" value="100 100 100" />
+			</attributes>
+			<components>
+				<component _id="3" _typeName="Skybox">
+					<attributes>
+						<attribute name="Model" type="ResourceRef" value="Model;Models/Box.mdl" />
+						<attribute name="Material" type="ResourceRefList" value="Material;Materials/Skyplane.xml" />
+					</attributes>
+				</component>
+			</components>
+		</node>
+		<node _id="3">
+			<attributes>
+				<attribute name="Name" type="String" value="Global Zone" />
+			</attributes>
+			<components>
+				<component _id="4" _typeName="Zone">
+					<attributes>
+						<attribute name="Bounding Box Min" type="Vector3" value="-1000 -1000 -1000" />
+						<attribute name="Bounding Box Max" type="Vector3" value="1000 1000 1000" />
+						<attribute name="Ambient Color" type="Color" value="0 0 0 1" />
+						<attribute name="Background Brightness" type="Float" value="0.500000" />
+						<attribute name="Zone Texture" type="ResourceRef" value="TextureCube;Textures/DefaultSkybox.xml" />
+					</attributes>
+				</component>
+			</components>
+		</node>
+		<node _id="4">
+			<attributes>
+				<attribute name="Name" type="String" value="Global Light" />
+				<attribute name="Rotation" type="Quaternion" value="0.888074 0.325058 0.325058 -0" />
+			</attributes>
+			<components>
+				<component _id="5" _typeName="Light">
+					<attributes>
+						<attribute name="Light Type" type="String" value="Directional" />
+						<attribute name="Brightness Multiplier" type="Float" value="0.500000" />
+						<attribute name="Cast Shadows" type="Bool" value="true" />
+					</attributes>
+				</component>
+			</components>
+		</node>
+		<node _id="7">
+			<attributes>
+				<attribute name="Name" type="String" value="Main Camera" />
+			</attributes>
+			<components>
+				<component _id="15" _typeName="Camera">
+					<attributes>
+						<attribute name="Near Clip" type="Float" value="0.010000" />
+						<attribute name="Far Clip" type="Float" value="10.000000" />
+					</attributes>
+				</component>
+			</components>
+		</node>
+	</nodes>
+	<auxiliary />
+</resource>

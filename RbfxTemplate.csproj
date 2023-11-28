@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageType>Template</PackageType>
+    <PackageVersion>1.0</PackageVersion>
+    <PackageReadmeFile>./README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>./content/Content/Common/Data/Images/Splash.png</PackageIcon>
+    <PackageId>rbfx.template.casual</PackageId>
+    <NoDefaultExcludes>true</NoDefaultExcludes>
+    <Title>Rebel Framework Casual Project Template</Title>
+    <Authors>rbfx</Authors>
+    <Description>Templates to use when creating a casual game using Rebel Framework.</Description>
+    <PackageTags>dotnet-new;templates;rbfx</PackageTags>
+    <TargetFramework>net7.0</TargetFramework>
+
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ContentTargetFolders>content</ContentTargetFolders>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="**\*" Exclude="**\bin\**;**\obj\**;RbfxTemplate.csproj;.vs\**\*;.git;.vs" />
+    <Compile Remove="**\*" />
+    <None Include="README.md" Pack="true" PackagePath="/"/>
+  </ItemGroup>
+
+</Project>

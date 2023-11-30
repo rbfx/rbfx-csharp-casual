@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using Urho3DNet;
 
@@ -25,8 +24,6 @@ namespace RbfxTemplate
         {
         }
 
-
-
         /// <summary>
         ///     Setup application.
         ///     This method is executed before most of the engine system initialized.
@@ -41,6 +38,7 @@ namespace RbfxTemplate
             EngineParameters[Urho3D.EpOrganizationName] = "RbfxTemplate";
             EngineParameters[Urho3D.EpFrameLimiter] = true;
             EngineParameters[Urho3D.EpConfigName] = "";
+            EngineParameters[Urho3D.EpOrientations] = "LandscapeLeft LandscapeRight Portrait";
 
             // Run shaders via SpirV-Cross to eliminate potential driver bugs
             EngineParameters[Urho3D.EpShaderPolicyGlsl] = 0;
@@ -59,9 +57,8 @@ namespace RbfxTemplate
             // Subscribe for log messages.
             SubscribeToEvent(E.LogMessage, OnLogMessage);
 
-            // Limit frame rate tp 60 FPS as a workaround for kinematic character controller movement.
+            // Limit frame rate tp 60 FPS to save battery time on mobile devices.
             Context.Engine.MaxFps = 60;
-
 
 #if DEBUG
             // Setup Debug HUD when building in Debug configuration.

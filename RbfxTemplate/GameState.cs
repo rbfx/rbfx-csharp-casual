@@ -4,14 +4,14 @@ namespace RbfxTemplate
 {
     [ObjectFactory]
     [Preserve(AllMembers = true)]
-    public class GameState : ApplicationState
+    public sealed class GameState : RmlUIStateBase
     {
-        protected readonly SharedPtr<Scene> _scene;
+        private readonly SharedPtr<Scene> _scene;
         private readonly UrhoPluginApplication _app;
         private readonly Node _cameraNode;
         private readonly Viewport _viewport;
 
-        public GameState(UrhoPluginApplication app) : base(app.Context)
+        public GameState(UrhoPluginApplication app) : base(app, "UI/GameScreen.rml")
         {
             MouseMode = MouseMode.MmFree;
             IsMouseVisible = true;
@@ -26,6 +26,13 @@ namespace RbfxTemplate
             _viewport.Scene = _scene;
             SetViewport(0, _viewport);
             _scene.Ptr.IsUpdateEnabled = false;
+
+            Deactivate();
+
+        }
+
+        public override void OnDataModelInitialized(GameRmlUIComponent component)
+        {
         }
 
         public override void Activate(StringVariantMap bundle)

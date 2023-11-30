@@ -6,25 +6,33 @@ namespace RbfxTemplate
 {
     [ObjectFactory]
     [Preserve(AllMembers = true)]
-    public class MainMenuState : MenuStateBase
+    public class MainMenuState : RmlUIStateBase
     {
+        protected readonly SharedPtr<Scene> _scene;
+        private readonly Viewport _viewport;
+
         public MainMenuState(UrhoPluginApplication app) : base(app, "UI/MainMenu.rml")
         {
+            _scene = Context.CreateObject<Scene>();
+            _scene.Ptr.CreateComponent<Octree>();
             var skybox = _scene.Ptr.CreateComponent<Skybox>();
             skybox.SetModel(ResourceCache.GetResource<Model>("Models/Box.mdl"));
             skybox.SetMaterial(ResourceCache.GetResource<Material>("Materials/Skyplane.xml"));
+            _viewport = Context.CreateObject<Viewport>();
+            _viewport.Camera = _scene.Ptr.CreateComponent<Camera>();
+            _viewport.Scene = _scene;
+            SetViewport(0, _viewport);
         }
 
-        public override void OnDataModelInitialized(MenuComponent menuComponent)
+        public override void OnDataModelInitialized(GameRmlUIComponent component)
         {
-            menuComponent.BindDataModelProperty("is_game_played", _ => _.Set(Application?.IsGameRunning == true),
+            component.BindDataModelProperty("is_game_played", _ => _.Set(Application?.IsGameRunning == true),
                 _ => { });
-            //menuComponent.BindDataModelProperty("bloom", _ => _.Set(_bloom), _ => { _bloom = _.Bool; });
-            menuComponent.BindDataModelProperty("game_title", _ => _.Set("Awesome game"), _ => { });
-            menuComponent.BindDataModelEvent("Continue", OnContinue);
-            menuComponent.BindDataModelEvent("NewGame", OnNewGame);
-            menuComponent.BindDataModelEvent("Exit", OnExit);
-            menuComponent.BindDataModelEvent("Discord", OnDiscord);
+            component.BindDataModelProperty("game_title", _ => _.Set("Awesome game"), _ => { });
+            component.BindDataModelEvent("Continue", OnContinue);
+            component.BindDataModelEvent("NewGame", OnNewGame);
+            component.BindDataModelEvent("Exit", OnExit);
+            component.BindDataModelEvent("Discord", OnDiscord);
         }
 
         public void OnNewGame(VariantList variantList)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using Urho3DNet;
 
@@ -14,7 +15,7 @@ namespace RbfxTemplate
         /// <summary>
         /// PrivacyPolicyAccepted identifier
         /// </summary>
-        static readonly string privacyPolicyAcceptedFileId_ = "conf:PrivacyPolicyAccepted";
+        static readonly FileIdentifier privacyPolicyAcceptedFileId_ = new FileIdentifier("conf","PrivacyPolicyAccepted");
 
         /// <summary>
         ///     Safe pointer to game screen.
@@ -86,7 +87,7 @@ namespace RbfxTemplate
                 stateManager.EnqueueState(splash);
             }
 
-            if (!Context.ResourceCache.Exists(privacyPolicyAcceptedFileId_))
+            if (!Context.VirtualFileSystem.Exists(privacyPolicyAcceptedFileId_))
             {
                 _stateStack.Push(new AcceptPrivacyPolicyState(this));
             }
@@ -158,15 +159,18 @@ namespace RbfxTemplate
             }
         }
 
+        /// <summary>
+        /// Mark privacy policy as accepted and go to main menu.
+        /// </summary>
         public void AcceptPrivacyPolicy()
         {
             // Create file marker that privacy policy was accepted.
-            Context.VirtualFileSystem.WriteAllText(new FileIdentifier(privacyPolicyAcceptedFileId_),
-                DateTime.Now.ToString());
+            Context.VirtualFileSystem.WriteAllText(privacyPolicyAcceptedFileId_,
+                DateTime.Now.ToString(CultureInfo.InvariantCulture));
 
             // Crate end enqueue main menu screen.
             _mainMenuState = _mainMenuState ?? new MainMenuState(this);
-            _stateStack.Push(_mainMenuState);
+            _stateStack.Switch(_mainMenuState);
         }
     }
 }

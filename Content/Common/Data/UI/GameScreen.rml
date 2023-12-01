@@ -42,7 +42,9 @@
 				<img sprite="icon-settings"></img>
 			<!--</input>-->
 			</div>
-			<div style="float: right">0$</div>
+			<div style="float: right">
+				<img sprite="icon-diamond"></img> 0
+			</div>
 			<div style="text-align: center">Level 1</div>
 		</div>
 		<div class="gray-footer-panel menu-panel" style="top: 100%; left: 50%; position: absolute; transform: translate(-50%, -100%); width: 100%; ">

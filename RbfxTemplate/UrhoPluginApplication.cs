@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Urho3DNet;
 
 namespace RbfxTemplate
@@ -10,6 +11,11 @@ namespace RbfxTemplate
     [Preserve(AllMembers = true)]
     public class UrhoPluginApplication : PluginApplication
     {
+        /// <summary>
+        /// PrivacyPolicyAccepted identifier
+        /// </summary>
+        static readonly string privacyPolicyAcceptedFileId_ = "conf:PrivacyPolicyAccepted";
+
         /// <summary>
         ///     Safe pointer to game screen.
         /// </summary>
@@ -80,10 +86,16 @@ namespace RbfxTemplate
                 stateManager.EnqueueState(splash);
             }
 
-
-            // Crate end enqueue main menu screen.
-            _mainMenuState = _mainMenuState ?? new MainMenuState(this);
-            _stateStack.Push(_mainMenuState);
+            if (!Context.ResourceCache.Exists(privacyPolicyAcceptedFileId_))
+            {
+                _stateStack.Push(new AcceptPrivacyPolicyState(this));
+            }
+            else
+            {
+                // Crate end enqueue main menu screen.
+                _mainMenuState = _mainMenuState ?? new MainMenuState(this);
+                _stateStack.Push(_mainMenuState);
+            }
 
             base.Start(isMain);
         }
@@ -144,6 +156,17 @@ namespace RbfxTemplate
             {
                 _stateStack.Pop();
             }
+        }
+
+        public void AcceptPrivacyPolicy()
+        {
+            // Create file marker that privacy policy was accepted.
+            Context.VirtualFileSystem.WriteAllText(new FileIdentifier(privacyPolicyAcceptedFileId_),
+                DateTime.Now.ToString());
+
+            // Crate end enqueue main menu screen.
+            _mainMenuState = _mainMenuState ?? new MainMenuState(this);
+            _stateStack.Push(_mainMenuState);
         }
     }
 }

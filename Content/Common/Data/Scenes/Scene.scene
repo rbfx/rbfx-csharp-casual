@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <resource _id="1">
 	<attributes>
-		<attribute name="Next Node ID" type="Int" value="8" />
-		<attribute name="Next Component ID" type="Int" value="19" />
+		<attribute name="Next Node ID" type="Int" value="31" />
+		<attribute name="Next Component ID" type="Int" value="57" />
 	</attributes>
 	<components>
 		<component _id="1" _typeName="Octree" />
@@ -14,6 +14,7 @@
 			</attributes>
 		</component>
 		<component _id="11" _typeName="ReflectionProbeManager" />
+		<component _id="32" _typeName="PhysicsWorld" />
 	</components>
 	<nodes>
 		<node _id="2">
@@ -39,9 +40,8 @@
 					<attributes>
 						<attribute name="Bounding Box Min" type="Vector3" value="-1000 -1000 -1000" />
 						<attribute name="Bounding Box Max" type="Vector3" value="1000 1000 1000" />
-						<attribute name="Ambient Color" type="Color" value="0 0 0 1" />
+						<attribute name="Ambient Color" type="Color" value="1 1 1 1" />
 						<attribute name="Background Brightness" type="Float" value="0.500000" />
-						<attribute name="Zone Texture" type="ResourceRef" value="TextureCube;Textures/DefaultSkybox.xml" />
 					</attributes>
 				</component>
 			</components>
@@ -64,12 +64,43 @@
 		<node _id="7">
 			<attributes>
 				<attribute name="Name" type="String" value="Main Camera" />
+				<attribute name="Position" type="Vector3" value="0 2 0" />
+				<attribute name="Rotation" type="Quaternion" value="0.707107 0.707107 0 0" />
 			</attributes>
 			<components>
 				<component _id="15" _typeName="Camera">
 					<attributes>
-						<attribute name="Near Clip" type="Float" value="0.010000" />
+						<attribute name="Near Clip" type="Float" value="0.000000" />
 						<attribute name="Far Clip" type="Float" value="10.000000" />
+						<attribute name="Orthographic" type="Bool" value="true" />
+						<attribute name="Orthographic Size" type="Float" value="5.000000" />
+					</attributes>
+				</component>
+			</components>
+		</node>
+		<node _id="8">
+			<attributes>
+				<attribute name="Is Enabled" type="Bool" value="false" />
+				<attribute name="Name" type="String" value="Link" />
+				<attribute name="Position" type="Vector3" value="0 1.19209e-07 0" />
+			</attributes>
+			<components>
+				<component _id="41" _typeName="PrefabReference">
+					<attributes>
+						<attribute name="Prefab" type="ResourceRef" value="PrefabResource;Objects/Link.prefab" />
+					</attributes>
+				</component>
+			</components>
+		</node>
+		<node _id="20">
+			<attributes>
+				<attribute name="Is Enabled" type="Bool" value="false" />
+				<attribute name="Name" type="String" value="Tile" />
+			</attributes>
+			<components>
+				<component _id="34" _typeName="PrefabReference">
+					<attributes>
+						<attribute name="Prefab" type="ResourceRef" value="PrefabResource;Objects/Tile.prefab" />
 					</attributes>
 				</component>
 			</components>

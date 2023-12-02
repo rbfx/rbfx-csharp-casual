@@ -1,0 +1,3 @@
+Emoji images are under the Apache license, version 2.0.
+
+https://github.com/googlefonts/noto-emoji

@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Runtime.InteropServices;
-using Urho3DNet;
+﻿using Urho3DNet;
 
 namespace RbfxTemplate
 {

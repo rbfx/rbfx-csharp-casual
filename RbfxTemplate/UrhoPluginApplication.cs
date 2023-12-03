@@ -62,21 +62,18 @@ namespace RbfxTemplate
         {
             _stateStack = new StateStack(Context.GetSubsystem<StateManager>());
 
-            // Loads all fonts from the resource cache and adds them to the RmlUI.
-            var cache = GetSubsystem<ResourceCache>();
-            var ui = GetSubsystem<RmlUI>();
-            var fonts = new StringList();
-            // Scan for .ttf files and load them
-            cache.Scan(fonts, "Fonts/", "*.ttf", ScanFlag.ScanFiles);
-            foreach (var font in fonts) ui.LoadFont($"Fonts/{font}");
-            // Scan for .otf files and load them
-            cache.Scan(fonts, "Fonts/", "*.otf", ScanFlag.ScanFiles);
-            foreach (var font in fonts) ui.LoadFont($"Fonts/{font}");
-
             // Setup state manager.
             var stateManager = Context.GetSubsystem<StateManager>();
             stateManager.FadeInDuration = 0.1f;
             stateManager.FadeOutDuration = 0.1f;
+
+            StringList stringList = new StringList();
+            Context.VirtualFileSystem.Scan(stringList, new FileIdentifier("", "Images/Emoji"), "*.png", ScanFlag.ScanFiles);
+            foreach (var imageName in stringList)
+            {
+                Context.ResourceCache.BackgroundLoadResource(nameof(Texture2D), "Images/Emoji/" + imageName);
+            }
+
 
             // Setup end enqueue splash screen.
             using (SharedPtr<SplashScreen> splash = new SplashScreen(Context))

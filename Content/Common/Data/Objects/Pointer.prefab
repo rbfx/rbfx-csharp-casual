@@ -2,76 +2,37 @@
 	"components": [
 		{
 			"_typeName": "Octree"
-		},
-		{
-			"_typeName": "RenderPipeline"
-		},
-		{
-			"_typeName": "ReflectionProbeManager"
 		}
 	],
 	"nodes": [
 		{
-			"components": [
-				{
-					"_typeName": "AnimatedModel",
-					"attributes": [
-						{
-							"name": "Model",
-							"type": "ResourceRef",
-							"value": "Model;Models/Link.mdl"
-						},
-						{
-							"name": "Material",
-							"type": "ResourceRefList",
-							"value": "Material;Materials/White.material"
-						},
-						{
-							"name": "Bone Animation Enabled",
-							"type": "VariantVector",
-							"value": [
-								{
-									"type": "Bool",
-									"value": true
-								},
-								{
-									"type": "Bool",
-									"value": true
-								},
-								{
-									"type": "Bool",
-									"value": true
-								}
-							]
-						}
-					]
-				}
-			],
 			"nodes": [
 				{
 					"attributes": [
 						{
 							"name": "Name",
 							"type": "String",
-							"value": "Root"
-						}
-					],
-					"nodes": [
-						{
-							"attributes": [
-								{
-									"name": "Name",
-									"type": "String",
-									"value": "A"
-								}
-							]
+							"value": "Pointer"
 						},
 						{
+							"name": "Position",
+							"type": "Vector3",
+							"value": "0.25 0.3 -0.254"
+						}
+					],
+					"components": [
+						{
+							"_typeName": "StaticModel",
 							"attributes": [
 								{
-									"name": "Name",
-									"type": "String",
-									"value": "B"
+									"name": "Model",
+									"type": "ResourceRef",
+									"value": "Model;Models/Plane.mdl"
+								},
+								{
+									"name": "Material",
+									"type": "ResourceRefList",
+									"value": "Material;Materials/Touch.material"
 								}
 							]
 						}

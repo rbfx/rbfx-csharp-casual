@@ -52,5 +52,9 @@ namespace RbfxTemplate.GameStates
         {
             
         }
+
+        public virtual void Update(float timeStep)
+        {
+        }
     }
 }

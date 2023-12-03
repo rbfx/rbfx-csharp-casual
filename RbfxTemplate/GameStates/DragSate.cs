@@ -15,6 +15,7 @@ namespace RbfxTemplate.GameStates
         {
             _tile = tile;
             _touchId = touchId;
+            tile.LinkTo(null);
         }
 
         public override void Activate()
@@ -40,7 +41,7 @@ namespace RbfxTemplate.GameStates
             var ray = Game.GetScreenRay(intVector2);
             var normal = Vector3.Up;
             var d = normal.DotProduct(ray.Direction);
-            float t = -(normal.DotProduct(ray.Origin) + 0.0f) / d;
+            float t = -(normal.DotProduct(ray.Origin) - _tile.Link.Position.Y) / d;
             _tile.LinkTarget.WorldPosition = ray.Origin + ray.Direction * t;
             _tile.LinkSource.LookAt(_tile.LinkTarget.WorldPosition);
             _tile.LinkTarget.LookAt(_tile.LinkSource.WorldPosition);
@@ -50,7 +51,14 @@ namespace RbfxTemplate.GameStates
         {
             if (_touchId.HasValue) { return; }
 
-            Game.LinkTiles(Game.PickTile(inputMousePosition));
+            CompleteLink(inputMousePosition);
+        }
+
+        private void CompleteLink(IntVector2 inputMousePosition)
+        {
+            var link = Game.PickTile(inputMousePosition);
+            _tile.LinkTo(link);
+            Game.StartPicking();
         }
 
         public override void HandleTouchMove(int touchId, IntVector2 intVector2)
@@ -64,7 +72,7 @@ namespace RbfxTemplate.GameStates
         {
             if (_touchId != touchId) { return; }
 
-            Game.LinkTiles(Game.PickTile(intVector2));
+            CompleteLink(intVector2);
         }
     }
 }

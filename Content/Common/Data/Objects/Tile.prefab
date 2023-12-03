@@ -34,7 +34,7 @@
 						{
 							"name": "Material",
 							"type": "ResourceRefList",
-							"value": "Material;Materials/Emoji/emoji_u1f431.material"
+							"value": "Material;Materials/TileMaterial.material"
 						}
 					]
 				},
@@ -85,6 +85,16 @@
 							"name": "Name",
 							"type": "String",
 							"value": "Link"
+						},
+						{
+							"name": "Position",
+							"type": "Vector3",
+							"value": "0 -0.1 0"
+						},
+						{
+							"name": "Scale",
+							"type": "Vector3",
+							"value": "1.2 1.2 1.2"
 						}
 					],
 					"components": [

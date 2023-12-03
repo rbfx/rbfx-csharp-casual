@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <material>
 	<technique name="Techniques/UnlitOpaque.xml" quality="0" loddistance="0.000000" />
-	<texture slot="Albedo" name="Images/Emoji/emoji_u1f436.png" />
+	<texture slot="Albedo" name="Images/TouchCursor512.png" />
 	<shader vsdefines="ALPHAMASK " psdefines="ALPHAMASK " />
 	<parameter name="MatEnvMapColor" value="1 1 1" />
 	<parameter name="NormalScale" value="1.000000" />

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <resource _id="1">
 	<attributes>
-		<attribute name="Next Node ID" type="Int" value="31" />
-		<attribute name="Next Component ID" type="Int" value="57" />
+		<attribute name="Next Node ID" type="Int" value="21" />
+		<attribute name="Next Component ID" type="Int" value="42" />
 	</attributes>
 	<components>
 		<component _id="1" _typeName="Octree" />

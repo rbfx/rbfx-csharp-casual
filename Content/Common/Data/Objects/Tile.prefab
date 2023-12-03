@@ -50,6 +50,111 @@
 				},
 				{
 					"_typeName": "RigidBody"
+				},
+				{
+					"_typeName": "Tile",
+					"attributes": [
+						{
+							"name": "Link",
+							"type": "Int",
+							"value": 1
+						},
+						{
+							"name": "LinkSource",
+							"type": "Int",
+							"value": 2
+						},
+						{
+							"name": "LinkTarget",
+							"type": "Int",
+							"value": 3
+						}
+					]
+				}
+			],
+			"nodes": [
+				{
+					"_id": 1,
+					"attributes": [
+						{
+							"name": "Is Enabled",
+							"type": "Bool",
+							"value": false
+						},
+						{
+							"name": "Name",
+							"type": "String",
+							"value": "Link"
+						}
+					],
+					"components": [
+						{
+							"_typeName": "AnimatedModel",
+							"attributes": [
+								{
+									"name": "Model",
+									"type": "ResourceRef",
+									"value": "Model;Models/Link.mdl"
+								},
+								{
+									"name": "Material",
+									"type": "ResourceRefList",
+									"value": "Material;Materials/White.material"
+								},
+								{
+									"name": "Bone Animation Enabled",
+									"type": "VariantVector",
+									"value": [
+										{
+											"type": "Bool",
+											"value": true
+										},
+										{
+											"type": "Bool",
+											"value": true
+										},
+										{
+											"type": "Bool",
+											"value": true
+										}
+									]
+								}
+							]
+						}
+					],
+					"nodes": [
+						{
+							"attributes": [
+								{
+									"name": "Name",
+									"type": "String",
+									"value": "Root"
+								}
+							],
+							"nodes": [
+								{
+									"_id": 2,
+									"attributes": [
+										{
+											"name": "Name",
+											"type": "String",
+											"value": "A"
+										}
+									]
+								},
+								{
+									"_id": 3,
+									"attributes": [
+										{
+											"name": "Name",
+											"type": "String",
+											"value": "B"
+										}
+									]
+								}
+							]
+						}
+					]
 				}
 			]
 		},

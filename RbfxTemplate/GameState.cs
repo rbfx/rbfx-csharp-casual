@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using RbfxTemplate.GameStates;
 using Urho3DNet;
 
 namespace RbfxTemplate
@@ -14,12 +15,36 @@ namespace RbfxTemplate
         private readonly Viewport _viewport;
 
         private Dictionary<string, Material> _tileMaterials = new Dictionary<string, Material>();
-        private readonly Node _link;
+
+        private PickSate _pickSate;
+        private DragSate _dragSate;
+        private StateBase _state;
+
+        public StateBase State
+        {
+            get
+            {
+                return _state;
+            }
+            set
+            {
+                if (_state != value)
+                {
+                    _state?.Deactivate();
+                    _state = value;
+                    _state?.Activate();
+                }
+            }
+        }
+
+        private PhysicsRaycastResult _raycastResult;
 
         public GameState(UrhoPluginApplication app) : base(app, "UI/GameScreen.rml")
         {
             MouseMode = MouseMode.MmFree;
             IsMouseVisible = true;
+
+            _raycastResult = new PhysicsRaycastResult();
 
             _app = app;
             _scene = Context.CreateObject<Scene>();
@@ -41,23 +66,25 @@ namespace RbfxTemplate
                     Context.ResourceCache.GetResource<Material>("Materials/Emoji/" + matName);
             }
 
-            _link = _scene.Ptr.GetChild("Link", true);
-
             Vector3 pos = Vector3.Zero;
+            var tilePrefab = Context.ResourceCache.GetResource<PrefabResource>("Objects/Tile.prefab");
             foreach (var tileMaterial in _tileMaterials)
             {
-                var tile = _scene.Ptr.CreateChild();
-                var prefabReference = tile.CreateComponent<PrefabReference>();
-                prefabReference.SetPrefab(Context.ResourceCache.GetResource<PrefabResource>("Objects/Tile.prefab"));
-                prefabReference.Inline(PrefabInlineFlag.None);
+                var tile = _scene.Ptr.InstantiatePrefab(tilePrefab);
+                //var prefabReference = tile.CreateComponent<PrefabReference>();
+                //prefabReference.SetPrefab();
+                //prefabReference.Inline(PrefabInlineFlag.None);
                 var model = tile.GetComponent<StaticModel>(true);
                 model.SetMaterial(tileMaterial.Value);
                 tile.Position = pos;
                 pos += Vector3.Forward;
             }
 
-            Deactivate();
+            _pickSate = new PickSate(this);
+            _dragSate = new DragSate(this);
+            State = _pickSate;
 
+            Deactivate();
         }
 
         public override void OnDataModelInitialized(GameRmlUIComponent component)
@@ -72,6 +99,10 @@ namespace RbfxTemplate
             SubscribeToEvent(E.MouseButtonUp, HandleMouseUp);
             SubscribeToEvent(E.MouseMove, HandleMouseMove);
 
+            SubscribeToEvent(E.TouchBegin, HandleTouchBegin);
+            SubscribeToEvent(E.TouchEnd, HandleTouchEnd);
+            SubscribeToEvent(E.TouchMove, HandleTouchMove);
+
             _scene.Ptr.IsUpdateEnabled = true;
 
 
@@ -79,32 +110,54 @@ namespace RbfxTemplate
             base.Activate(bundle);
         }
 
-        private void HandleMouseMove(StringHash arg1, VariantMap arg2)
+        private void HandleTouchBegin(VariantMap args)
         {
-            if (!_link.IsEnabled)
-                return;
-
-            var x = arg2[E.MouseMove.X].Int;
-            var y = arg2[E.MouseMove.Y].Int;
-            var ray = _viewport.GetScreenRay(x, y);
-            var normal = Vector3.Up;
-            var d = normal.DotProduct(ray.Direction);
-            float t = -(normal.DotProduct(ray.Origin) + 0.0f) / d;
-            var a = _link.GetChild("A", true);
-            var b = _link.GetChild("B", true);
-            b.Position = ray.Origin + ray.Direction * t;
-            a.LookAt(b.Position);
-            b.LookAt(a.Position);
+            var touchId = args[E.TouchBegin.TouchID].Int;
+            var x = args[E.TouchBegin.X].Int;
+            var y = args[E.TouchBegin.Y].Int;
+            _state.HandleTouchBegin(touchId, new IntVector2(x,y));
         }
 
-        private void HandleMouseUp(StringHash arg1, VariantMap arg2)
+        private void HandleTouchEnd(VariantMap args)
         {
-            _link.IsEnabled = false;
+            var touchId = args[E.TouchEnd.TouchID].Int;
+            var x = args[E.TouchEnd.X].Int;
+            var y = args[E.TouchEnd.Y].Int;
+            _state.HandleTouchEnd(touchId, new IntVector2(x, y));
         }
 
-        private void HandleMouseDown(StringHash arg1, VariantMap arg2)
+        private void HandleTouchMove(VariantMap args)
         {
-            _link.IsEnabled = true;
+            var touchId = args[E.TouchMove.TouchID].Int;
+            var x = args[E.TouchMove.X].Int;
+            var y = args[E.TouchMove.Y].Int;
+            _state.HandleTouchMove(touchId, new IntVector2(x, y));
+        }
+
+        private void HandleMouseMove(VariantMap args)
+        {
+            var buttons = args[E.MouseMove.Buttons].Int;
+            var qualifiers = args[E.MouseMove.Qualifiers].Int;
+            var x = args[E.MouseMove.X].Int;
+            var y = args[E.MouseMove.Y].Int;
+            _state.HandleMouseMove(new IntVector2(x, y), buttons, qualifiers);
+
+        }
+
+        private void HandleMouseUp(StringHash arg1, VariantMap args)
+        {
+            var buttons = args[E.MouseButtonUp.Buttons].Int;
+            var qualifiers = args[E.MouseButtonUp.Qualifiers].Int;
+            var button = args[E.MouseButtonUp.Button].Int;
+            _state.HandleMouseUp(button, Context.Input.MousePosition, buttons, qualifiers);
+        }
+
+        private void HandleMouseDown(StringHash arg1, VariantMap args)
+        {
+            var buttons = args[E.MouseButtonDown.Buttons].Int;
+            var qualifiers = args[E.MouseButtonDown.Qualifiers].Int;
+            var button = args[E.MouseButtonDown.Button].Int;
+            _state.HandleMouseDown(button, Context.Input.MousePosition, buttons, qualifiers);
         }
 
         public override void Deactivate()
@@ -131,6 +184,34 @@ namespace RbfxTemplate
                     _app.HandleBackKey();
                     return;
             }
+        }
+        public Ray GetScreenRay(IntVector2 inputMousePosition)
+        {
+            return _viewport.GetScreenRay(inputMousePosition.X, inputMousePosition.Y);
+        }
+
+        public Tile PickTile(IntVector2 inputMousePosition)
+        {
+            var ray = GetScreenRay(inputMousePosition);
+            var physics = _scene.Ptr.GetComponent<PhysicsWorld>();
+            physics.RaycastSingle(_raycastResult, ray, 100);
+            if (_raycastResult.Body != null)
+            {
+                return _raycastResult.Body.Node.GetComponent<Tile>() ?? _raycastResult.Body.Node.GetParentComponent<Tile>(true);
+            }
+            return null;
+        }
+
+        public void DragTile(Tile tile, int? touchId)
+        {
+            _dragSate.TrackTile(tile, touchId);
+            State = _dragSate;
+
+        }
+
+        public void LinkTiles(Tile pickTile)
+        {
+            State = _pickSate;
         }
     }
 }

@@ -6,14 +6,18 @@ namespace RbfxTemplate
     [Preserve(AllMembers = true)]
     public sealed class Tile : Component
     {
-        [Urho3DNet.SerializeField(Mode = AttributeMode.AmDefault | AttributeMode.AmNodeid, Name = "Link")]
+        [SerializeField(Mode = AttributeMode.AmDefault | AttributeMode.AmNodeid, Name = "Link")]
         private int _linkId;
 
-        [Urho3DNet.SerializeField(Mode = AttributeMode.AmDefault | AttributeMode.AmNodeid, Name = "LinkSource")]
+        [SerializeField(Mode = AttributeMode.AmDefault | AttributeMode.AmNodeid, Name = "LinkSource")]
         private int _linkSource;
 
-        [Urho3DNet.SerializeField(Mode = AttributeMode.AmDefault | AttributeMode.AmNodeid, Name = "LinkTarget")]
+        [SerializeField(Mode = AttributeMode.AmDefault | AttributeMode.AmNodeid, Name = "LinkTarget")]
         private int _linkTarget;
+
+        public Tile(Context context) : base(context)
+        {
+        }
 
         public Node Link { get; set; }
 
@@ -25,8 +29,12 @@ namespace RbfxTemplate
 
         public Tile LinkedTile { get; set; }
 
-        public Tile(Context context) : base(context)
+        public override void ApplyAttributes()
         {
+            Link = Scene.GetNode((uint)_linkId);
+            LinkSource = Scene.GetNode((uint)_linkSource);
+            LinkTarget = Scene.GetNode((uint)_linkTarget);
+            base.ApplyAttributes();
         }
 
         public void LinkTo(Tile tile)
@@ -39,14 +47,13 @@ namespace RbfxTemplate
             {
                 var linkedTile = LinkedTile;
                 LinkedTile = null;
-                if (linkedTile != null)
-                {
-                    linkedTile.LinkTo(null);
-                }
+                if (linkedTile != null) linkedTile.LinkTo(null);
             }
 
             if (tile != null)
             {
+                var material = Context.ResourceCache.GetResource<Material>("Materials/White.material");
+                tile.Link.GetComponent<AnimatedModel>().SetMaterial(material);
                 LinkedTile = tile;
                 Link.IsEnabled = true;
                 LinkedTile.LinkTo(this);
@@ -56,14 +63,6 @@ namespace RbfxTemplate
                 LinkSource.LookAt(targetPos);
                 LinkTarget.LookAt(Node.WorldPosition);
             }
-        }
-
-        public override void ApplyAttributes()
-        {
-            Link = Scene.GetNode((uint)_linkId);
-            LinkSource = Scene.GetNode((uint)_linkSource);
-            LinkTarget = Scene.GetNode((uint)_linkTarget);
-            base.ApplyAttributes();
         }
     }
 }

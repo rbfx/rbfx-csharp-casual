@@ -3,15 +3,14 @@
 namespace RbfxTemplate
 {
     /// <summary>
-    /// Base class for a game state with RmlUI document.
+    ///     Base class for a game state with RmlUI document.
     /// </summary>
     public abstract class RmlUIStateBase : ApplicationState
     {
         private readonly SharedPtr<Scene> _scene;
-        private readonly GameRmlUIComponent _uiComponent;
 
         /// <summary>
-        /// Construct RmlUIStateBase.
+        ///     Construct RmlUIStateBase.
         /// </summary>
         /// <param name="app">Application instance.</param>
         /// <param name="rmlResource">Path to RmlUI document resource.</param>
@@ -22,53 +21,53 @@ namespace RbfxTemplate
             Application = app;
 
             _scene = Context.CreateObject<Scene>();
-            _uiComponent = _scene.Ptr.CreateComponent<GameRmlUIComponent>();
-            _uiComponent.IsEnabled = false;
-            _uiComponent.State = this;
-            _uiComponent.SetResource(rmlResource);
-            _uiComponent.IsEnabled = false;
+            RmlUiComponent = _scene.Ptr.CreateComponent<GameRmlUIComponent>();
+            RmlUiComponent.IsEnabled = false;
+            RmlUiComponent.State = this;
+            RmlUiComponent.SetResource(rmlResource);
+            RmlUiComponent.IsEnabled = false;
         }
 
         /// <summary>
-        /// RmlUI Component for the game state.
+        ///     RmlUI Component for the game state.
         /// </summary>
-        public GameRmlUIComponent RmlUiComponent => _uiComponent;
+        public GameRmlUIComponent RmlUiComponent { get; }
 
         /// <summary>
-        /// Application instance.
+        ///     Application instance.
         /// </summary>
         public UrhoPluginApplication Application { get; }
 
         /// <summary>
-        /// Data model initializer.
+        ///     Data model initializer.
         /// </summary>
         /// <param name="component">RmlUIComponent to initialize.</param>
         public abstract void OnDataModelInitialized(GameRmlUIComponent component);
 
         /// <summary>
-        /// Game state activation handler.
+        ///     Game state activation handler.
         /// </summary>
         /// <param name="bundle">Game state parameters.</param>
         public override void Activate(StringVariantMap bundle)
         {
-            _uiComponent.IsEnabled = true;
-            _uiComponent.UpdateProperties();
+            RmlUiComponent.IsEnabled = true;
+            RmlUiComponent.UpdateProperties();
             SubscribeToEvent(E.KeyUp, HandleKeyUp);
             base.Activate(bundle);
         }
 
         /// <summary>
-        /// Game state deactivation handler.
+        ///     Game state deactivation handler.
         /// </summary>
         public override void Deactivate()
         {
-            _uiComponent.IsEnabled = false;
+            RmlUiComponent.IsEnabled = false;
             UnsubscribeFromEvent(E.KeyUp);
             base.Deactivate();
         }
 
         /// <summary>
-        /// Key up handler to navigate back in the game state hierarchy.
+        ///     Key up handler to navigate back in the game state hierarchy.
         /// </summary>
         /// <param name="args"></param>
         private void HandleKeyUp(VariantMap args)

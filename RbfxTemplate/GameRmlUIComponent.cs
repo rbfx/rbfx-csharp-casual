@@ -1,5 +1,4 @@
-﻿using System;
-using Urho3DNet;
+﻿using Urho3DNet;
 
 namespace RbfxTemplate
 {

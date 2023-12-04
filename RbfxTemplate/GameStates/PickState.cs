@@ -2,10 +2,10 @@
 
 namespace RbfxTemplate.GameStates
 {
-    public class PickState: StateBase
+    public class PickState : StateBase
     {
         private readonly Node _pointer;
-        private Tile _hintTile = null;
+        private Tile _hintTile;
         private float _hintTime;
 
         public PickState(GameState game, Node pointer) : base(game)
@@ -16,10 +16,7 @@ namespace RbfxTemplate.GameStates
 
         public override void HandleMouseDown(int button, IntVector2 inputMousePosition, int buttons, int qualifiers)
         {
-            if (button != 1)
-            {
-                return;
-            }
+            if (button != 1) return;
 
             var tile = Game.PickTile(inputMousePosition);
             if (tile != null)
@@ -34,13 +31,13 @@ namespace RbfxTemplate.GameStates
         {
             if (_hintTile != null)
             {
-                _hintTime += timeStep*0.5f;
+                _hintTime += timeStep * 0.5f;
                 if (_hintTime >= 1.0f)
                     _hintTime = 0;
 
                 var a = _hintTile.Node.WorldPosition;
                 var b = _hintTile.ValidLink.Node.WorldPosition;
-                _pointer.WorldPosition = a.Lerp(b,_hintTime);
+                _pointer.WorldPosition = a.Lerp(b, _hintTime);
             }
         }
 

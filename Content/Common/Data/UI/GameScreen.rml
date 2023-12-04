@@ -38,15 +38,24 @@
 	<body data-model="GameRmlUIComponent"  style="width: 100%; height: 100%; margin: 0; nav: auto">
 		<div class="gray-header-panel menu-panel" style="top: 0%; left: 50%; position: absolute; transform: translate(-50%, 0); width: 100%; ">
 			<div style="float: left">
-			<!--<input type="button" class="blue-button" style="display: block">-->
+			<input type="button" class="blue-button" style="display: block" data-event-click="Settings">
 				<img sprite="icon-settings"></img>
-			<!--</input>-->
+			</input>
 			</div>
 			<div style="float: right">
 				<img sprite="icon-diamond"></img> 0
 			</div>
 			<div style="text-align: center">{{Level}}</div>
 		</div>
+		
+		<div data-visible="Victory" class="" style="background: #000000A0; padding:10px; top: 50%; left: 50%; position: absolute; transform: translate(-50%, -50%); width: 50%; max-height: 90%">
+			<div style="text-align: center">Level complete!</div>
+			<img src="../Images/Victory.png" style="margin: 0 auto; max-width: 33%"/>
+			<input type="button" class="blue-button" style="display: block"  data-event-click="Next">
+				Next
+			</input>
+		</div>
+
 		<div class="gray-footer-panel menu-panel" style="top: 100%; left: 50%; position: absolute; transform: translate(-50%, -100%); width: 100%; ">
 			<!--<input type="button" class="blue-button" style="display: block"  data-event-click="Exit">
 				Hint

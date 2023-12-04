@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using RbfxTemplate.GameStates;
 using Urho3DNet;
-using static System.Net.WebRequestMethods;
 
 namespace RbfxTemplate
 {
@@ -20,13 +19,8 @@ namespace RbfxTemplate
         private readonly PickState _pickState;
         private readonly DragState _dragState;
         private readonly VictoryState _victoryState;
-        private StateBase _state;
         private readonly Random _random = new Random();
         private readonly List<Tile> _currentTiles = new List<Tile>();
-        private Vector2 _areaSize = new Vector2(1,1);
-
-        private int _levelIndex;
-        private int _hintsLeft = 1;
 
         private readonly Tuple<string, string>[] _pairs =
         {
@@ -54,8 +48,12 @@ namespace RbfxTemplate
 
         private readonly PhysicsRaycastResult _raycastResult;
         private readonly Material _baseMaterial;
-        private readonly Sprite _victorySprite;
-        private readonly FiniteTimeAction _victoryAction;
+        private StateBase _state;
+        private Vector2 _areaSize = new Vector2(1, 1);
+
+        private int _levelIndex;
+        private int _hintsLeft = 1;
+        private bool _victory;
 
         public GameState(UrhoPluginApplication app) : base(app, "UI/GameScreen.rml")
         {
@@ -63,13 +61,6 @@ namespace RbfxTemplate
             IsMouseVisible = true;
 
             _raycastResult = new PhysicsRaycastResult();
-
-            _victorySprite = new Sprite(Context);
-            var victoryTexture = Context.ResourceCache.GetResource<Texture2D>("Images/Victory.png");
-            _victorySprite.Texture = victoryTexture;
-            _victorySprite.IsVisible = false;
-            _victorySprite.HotSpot = new IntVector2(victoryTexture.Size.X / 2, victoryTexture.Size.Y / 2);
-            UIRoot.AddChild(_victorySprite);
 
             _app = app;
             _scene = Context.CreateObject<Scene>();
@@ -95,13 +86,7 @@ namespace RbfxTemplate
             _dragState = new DragState(this);
             _victoryState = new VictoryState(this);
 
-            _victoryAction = new ActionBuilder(Context)
-                .ScaleBy(1.0f, new Vector2(10.0f, 10.0f)).ElasticInOut()
-                .DelayTime(0.5f).CallFunc(_=>NextLevel())
-                .Then(new ActionBuilder(Context).ScaleBy(1.0f, new Vector2(0.1f, 0.1f)).ElasticInOut().Build())
-                .Hide().Build();
-
-            NextLevel();
+            NextLevel(null);
 
             Deactivate();
         }
@@ -123,6 +108,14 @@ namespace RbfxTemplate
         public override void OnDataModelInitialized(GameRmlUIComponent component)
         {
             component.BindDataModelProperty("Level", _ => _.Set("Level " + _levelIndex), _ => { });
+            component.BindDataModelProperty("Victory", _ => _.Set(_victory), _ => { });
+            component.BindDataModelEvent("Next", NextLevel);
+            component.BindDataModelEvent("Settings", Settings);
+        }
+
+        private void Settings(VariantList obj)
+        {
+            _app.HandleBackKey();
         }
 
         public override void Activate(StringVariantMap bundle)
@@ -148,8 +141,8 @@ namespace RbfxTemplate
             _state.Update(timeStep);
 
             var orthoSizeY = _areaSize.Y;
-            var orthoSizeX = _areaSize.X * (float)UI.Size.Y / (float)UI.Size.X;
-            _camera.OrthoSize =  Math.Max(orthoSizeX, orthoSizeY);
+            var orthoSizeX = _areaSize.X * UI.Size.Y / UI.Size.X;
+            _camera.OrthoSize = Math.Max(orthoSizeX, orthoSizeY);
         }
 
         public override void Deactivate()
@@ -183,13 +176,10 @@ namespace RbfxTemplate
                 visited.Add(pair.Item1);
                 visited.Add(pair.Item2);
 
-                Tile t1 = CreateTile(pair.Item1);
-                Tile t2 = CreateTile(pair.Item2);
+                var t1 = CreateTile(pair.Item1);
+                var t2 = CreateTile(pair.Item2);
 
-                if (_random.Next(2) == 0)
-                {
-                    (t1, t2) = (t2, t1);
-                }
+                if (_random.Next(2) == 0) (t1, t2) = (t2, t1);
 
                 leftTiles.Add(t1.Node);
                 rightTiles.Add(t2.Node);
@@ -205,20 +195,20 @@ namespace RbfxTemplate
 
             var d = 1.5f;
 
-            var pos = new Vector3(0, 0, (-leftTiles.Count * 0.5f+0.5f)* d);
+            var pos = new Vector3(0, 0, (-leftTiles.Count * 0.5f + 0.5f) * d);
             for (var index = 0; index < leftTiles.Count; index++)
             {
-                leftTiles[index].Position = pos + new Vector3(-d, 0, index*d);
-                rightTiles[index].Position = pos + new Vector3(d, 0, index*d);
+                leftTiles[index].Position = pos + new Vector3(-d, 0, index * d);
+                rightTiles[index].Position = pos + new Vector3(d, 0, index * d);
             }
 
-            _areaSize = new Vector2(5, (leftTiles.Count+1)*d);
+            _areaSize = new Vector2(5, (leftTiles.Count + 1) * d);
         }
 
         public Tile CreateTile(string imageName)
         {
             var m = _baseMaterial.Clone();
-            var tex = Context.ResourceCache.GetResource<Texture2D>("Images/Emoji/" + imageName+".png");
+            var tex = Context.ResourceCache.GetResource<Texture2D>("Images/Emoji/" + imageName + ".png");
             m.SetTexture("Albedo", tex);
 
             var tile = _scene.Ptr.InstantiatePrefab(_tilePrefab);
@@ -252,32 +242,57 @@ namespace RbfxTemplate
         public void StartPicking()
         {
             State = _pickState;
+
+            var isComplete = true;
+            var isCorrect = true;
+            Tile hint = null;
+
             foreach (var tile in _currentTiles)
+            {
+                if (tile.LinkedTile == null) isComplete = false;
                 if (tile.LinkedTile != tile.ValidLink)
                 {
-                    if (_hintsLeft > 0)
-                    {
-                        _pickState.ShowHint(tile);
-                        --_hintsLeft;
-                    }
+                    isCorrect = false;
+                    hint = tile;
+                }
+            }
+
+            if (isComplete)
+            {
+                if (isCorrect)
+                {
+                    Victory();
+                }
+                else
+                {
+                    var material = Context.ResourceCache.GetResource<Material>("Materials/Red.material");
+                    foreach (var tile in _currentTiles)
+                        if (tile.LinkedTile != tile.ValidLink)
+                            tile.Link.GetComponent<AnimatedModel>().SetMaterial(material);
 
                     return;
                 }
+            }
 
-            Victory();
+            if (_hintsLeft > 0 && hint != null)
+            {
+                _pickState.ShowHint(hint);
+                --_hintsLeft;
+            }
         }
 
-        private void Victory()
+        public void NextLevel(VariantList args)
         {
-            State = _victoryState;
-            var size = UI.Size;
-            var s = Math.Min(size.X, size.Y) * 0.9f;
-            var imgSize = new Vector2(s, s);
-            _victorySprite.Position = size.ToVector2() *0.5f;
-            _victorySprite.Size = imgSize.ToIntVector2();
-            _victorySprite.IsVisible = true;
-            _victorySprite.Scale = new Vector2(0.1f, 0.1f);
-            ActionManager.AddAction(_victoryAction, _victorySprite);
+            _victory = false;
+            RmlUiComponent.UpdateProperties();
+
+            ++_levelIndex;
+            RmlUiComponent.UpdateProperties();
+            foreach (var tile in _currentTiles) tile.Node.Remove();
+
+            AddPairs(Math.Min(4, _levelIndex));
+
+            StartPicking();
         }
 
         protected override void Dispose(bool disposing)
@@ -285,6 +300,13 @@ namespace RbfxTemplate
             _scene?.Dispose();
 
             base.Dispose(disposing);
+        }
+
+        private void Victory()
+        {
+            State = _victoryState;
+            _victory = true;
+            RmlUiComponent.UpdateProperties();
         }
 
         private void Randomize(List<Node> rightTiles)
@@ -355,19 +377,6 @@ namespace RbfxTemplate
                     _app.HandleBackKey();
                     return;
             }
-        }
-
-        public void NextLevel()
-        {
-            //_victorySprite.IsVisible = false;
-
-            ++_levelIndex;
-            RmlUiComponent.UpdateProperties();
-            foreach (var tile in _currentTiles) tile.Node.Remove();
-
-            AddPairs(Math.Min(4, _levelIndex));
-
-            StartPicking();
         }
     }
 }

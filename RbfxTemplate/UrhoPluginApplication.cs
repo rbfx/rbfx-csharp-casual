@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using System.IO;
 using Urho3DNet;
 
 namespace RbfxTemplate
@@ -13,9 +12,10 @@ namespace RbfxTemplate
     public class UrhoPluginApplication : PluginApplication
     {
         /// <summary>
-        /// PrivacyPolicyAccepted identifier
+        ///     PrivacyPolicyAccepted identifier
         /// </summary>
-        static readonly FileIdentifier privacyPolicyAcceptedFileId_ = new FileIdentifier("conf","PrivacyPolicyAccepted");
+        private static readonly FileIdentifier privacyPolicyAcceptedFileId_ =
+            new FileIdentifier("conf", "PrivacyPolicyAccepted");
 
         /// <summary>
         ///     Safe pointer to game screen.
@@ -41,6 +41,65 @@ namespace RbfxTemplate
         /// </summary>
         public bool IsGameRunning => _gameState;
 
+        public override bool IsMain()
+        {
+            return true;
+        }
+
+
+        /// <summary>
+        ///     Transition to game
+        /// </summary>
+        public void ToNewGame()
+        {
+            _gameState?.Dispose();
+            _gameState = new GameState(this);
+            _stateStack.Push(_gameState);
+        }
+
+        /// <summary>
+        ///     Transition to game
+        /// </summary>
+        public void ContinueGame()
+        {
+            if (_gameState) _stateStack.Push(_gameState);
+            ;
+        }
+
+        public void Quit()
+        {
+            Context.Engine.Exit();
+        }
+
+        public void HandleBackKey()
+        {
+            if (_stateStack.State == _mainMenuState.Ptr)
+            {
+                if (IsGameRunning)
+                    ContinueGame();
+                else
+                    Quit();
+            }
+            else
+            {
+                _stateStack.Pop();
+            }
+        }
+
+        /// <summary>
+        ///     Mark privacy policy as accepted and go to main menu.
+        /// </summary>
+        public void AcceptPrivacyPolicy()
+        {
+            // Create file marker that privacy policy was accepted.
+            Context.VirtualFileSystem.WriteAllText(privacyPolicyAcceptedFileId_,
+                DateTime.Now.ToString(CultureInfo.InvariantCulture));
+
+            // Crate end enqueue main menu screen.
+            _mainMenuState = _mainMenuState ?? new MainMenuState(this);
+            _stateStack.Switch(_mainMenuState);
+        }
+
 
         protected override void Load()
         {
@@ -50,11 +109,6 @@ namespace RbfxTemplate
         protected override void Unload()
         {
             Context.RemoveFactories(GetType().Assembly);
-        }
-
-        public override bool IsMain()
-        {
-            return true;
         }
 
         protected override void Start(bool isMain)
@@ -112,60 +166,6 @@ namespace RbfxTemplate
         protected override void Resume(Archive input, bool differentVersion)
         {
             base.Resume(input, differentVersion);
-        }
-
-
-        /// <summary>
-        ///     Transition to game
-        /// </summary>
-        public void ToNewGame()
-        {
-            _gameState?.Dispose();
-            _gameState = new GameState(this);
-            _stateStack.Push(_gameState);
-        }
-
-        /// <summary>
-        ///     Transition to game
-        /// </summary>
-        public void ContinueGame()
-        {
-            if (_gameState) _stateStack.Push(_gameState);
-            ;
-        }
-
-        public void Quit()
-        {
-            Context.Engine.Exit();
-        }
-
-        public void HandleBackKey()
-        {
-            if (_stateStack.State == _mainMenuState.Ptr)
-            {
-                if (IsGameRunning)
-                    ContinueGame();
-                else
-                    Quit();
-            }
-            else
-            {
-                _stateStack.Pop();
-            }
-        }
-
-        /// <summary>
-        /// Mark privacy policy as accepted and go to main menu.
-        /// </summary>
-        public void AcceptPrivacyPolicy()
-        {
-            // Create file marker that privacy policy was accepted.
-            Context.VirtualFileSystem.WriteAllText(privacyPolicyAcceptedFileId_,
-                DateTime.Now.ToString(CultureInfo.InvariantCulture));
-
-            // Crate end enqueue main menu screen.
-            _mainMenuState = _mainMenuState ?? new MainMenuState(this);
-            _stateStack.Switch(_mainMenuState);
         }
     }
 }

@@ -36,7 +36,6 @@ namespace RbfxTemplate
         {
         }
 
-
         /// <summary>
         ///     Gets a value indicating whether the game is running.
         /// </summary>
@@ -67,13 +66,12 @@ namespace RbfxTemplate
             stateManager.FadeInDuration = 0.1f;
             stateManager.FadeOutDuration = 0.1f;
 
-            StringList stringList = new StringList();
-            Context.VirtualFileSystem.Scan(stringList, new FileIdentifier("", "Images/Emoji"), "*.png", ScanFlag.ScanFiles);
-            foreach (var imageName in stringList)
-            {
-                Context.ResourceCache.BackgroundLoadResource(nameof(Texture2D), "Images/Emoji/" + imageName);
-            }
-
+            //StringList stringList = new StringList();
+            //Context.VirtualFileSystem.Scan(stringList, new FileIdentifier("", "Images/Emoji"), "*.png", ScanFlag.ScanFiles);
+            //foreach (var imageName in stringList)
+            //{
+            //    Context.ResourceCache.BackgroundLoadResource(nameof(Texture2D), "Images/Emoji/" + imageName);
+            //}
 
             // Setup end enqueue splash screen.
             using (SharedPtr<SplashScreen> splash = new SplashScreen(Context))

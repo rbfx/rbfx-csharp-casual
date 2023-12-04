@@ -2,12 +2,12 @@
 
 namespace RbfxTemplate.GameStates
 {
-    public class DragSate : StateBase
+    public class DragState : StateBase
     {
         private Tile _tile;
         private int? _touchId;
 
-        public DragSate(GameState game) : base(game)
+        public DragState(GameState game) : base(game)
         {
         }
 

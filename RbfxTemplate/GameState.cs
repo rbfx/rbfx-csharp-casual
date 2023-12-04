@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using RbfxTemplate.GameStates;
 using Urho3DNet;
+using static System.Net.WebRequestMethods;
 
 namespace RbfxTemplate
 {
@@ -13,16 +13,17 @@ namespace RbfxTemplate
         private readonly SharedPtr<Scene> _scene;
         private readonly UrhoPluginApplication _app;
         private readonly Node _cameraNode;
+        private readonly Camera _camera;
         private readonly Viewport _viewport;
         private readonly PrefabResource _tilePrefab;
 
-        private readonly Dictionary<string, Material> _tileMaterials = new Dictionary<string, Material>();
-
-        private readonly PickSate _pickSate;
-        private readonly DragSate _dragSate;
+        private readonly PickState _pickState;
+        private readonly DragState _dragState;
+        private readonly VictoryState _victoryState;
         private StateBase _state;
         private readonly Random _random = new Random();
         private readonly List<Tile> _currentTiles = new List<Tile>();
+        private Vector2 _areaSize = new Vector2(1,1);
 
         private int _levelIndex;
         private int _hintsLeft = 1;
@@ -52,6 +53,9 @@ namespace RbfxTemplate
         };
 
         private readonly PhysicsRaycastResult _raycastResult;
+        private readonly Material _baseMaterial;
+        private readonly Sprite _victorySprite;
+        private readonly FiniteTimeAction _victoryAction;
 
         public GameState(UrhoPluginApplication app) : base(app, "UI/GameScreen.rml")
         {
@@ -60,30 +64,26 @@ namespace RbfxTemplate
 
             _raycastResult = new PhysicsRaycastResult();
 
+            _victorySprite = new Sprite(Context);
+            var victoryTexture = Context.ResourceCache.GetResource<Texture2D>("Images/Victory.png");
+            _victorySprite.Texture = victoryTexture;
+            _victorySprite.IsVisible = false;
+            _victorySprite.HotSpot = new IntVector2(victoryTexture.Size.X / 2, victoryTexture.Size.Y / 2);
+            UIRoot.AddChild(_victorySprite);
+
             _app = app;
             _scene = Context.CreateObject<Scene>();
             _scene.Ptr.LoadXML("Scenes/Scene.scene");
 
             _cameraNode = _scene.Ptr.GetChild("Main Camera");
             _viewport = Context.CreateObject<Viewport>();
-            _viewport.Camera = _cameraNode?.GetComponent<Camera>();
+            _camera = _cameraNode?.GetComponent<Camera>();
+            _viewport.Camera = _camera;
             _viewport.Scene = _scene;
             SetViewport(0, _viewport);
             _scene.Ptr.IsUpdateEnabled = false;
 
-            var stringList = new StringList();
-            Context.VirtualFileSystem.Scan(stringList, new FileIdentifier("", "Images/Emoji"), "*.png",
-                ScanFlag.ScanFiles);
-            var baseMaterial = Context.ResourceCache.GetResource<Material>("Materials/TileMaterial.material");
-            foreach (var imageName in stringList)
-            {
-                var m = baseMaterial.Clone();
-                var tex = Context.ResourceCache.GetResource<Texture2D>("Images/Emoji/" + imageName);
-                if (tex == null)
-                    throw new ExecutionEngineException();
-                m.SetTexture("Albedo", tex);
-                _tileMaterials[Path.GetFileNameWithoutExtension(imageName)] = m;
-            }
+            _baseMaterial = Context.ResourceCache.GetResource<Material>("Materials/TileMaterial.material");
 
             _tilePrefab = Context.ResourceCache.GetResource<PrefabResource>("Objects/Tile.prefab");
 
@@ -91,8 +91,15 @@ namespace RbfxTemplate
                 _scene.Ptr.InstantiatePrefab(
                     Context.ResourceCache.GetResource<PrefabResource>("Objects/Pointer.prefab"));
 
-            _pickSate = new PickSate(this, pointer);
-            _dragSate = new DragSate(this);
+            _pickState = new PickState(this, pointer);
+            _dragState = new DragState(this);
+            _victoryState = new VictoryState(this);
+
+            _victoryAction = new ActionBuilder(Context)
+                .ScaleBy(1.0f, new Vector2(10.0f, 10.0f)).ElasticInOut()
+                .DelayTime(0.5f).CallFunc(_=>NextLevel())
+                .Then(new ActionBuilder(Context).ScaleBy(1.0f, new Vector2(0.1f, 0.1f)).ElasticInOut().Build())
+                .Hide().Build();
 
             NextLevel();
 
@@ -139,6 +146,10 @@ namespace RbfxTemplate
         public override void Update(float timeStep)
         {
             _state.Update(timeStep);
+
+            var orthoSizeY = _areaSize.Y;
+            var orthoSizeX = _areaSize.X * (float)UI.Size.Y / (float)UI.Size.X;
+            _camera.OrthoSize =  Math.Max(orthoSizeX, orthoSizeY);
         }
 
         public override void Deactivate()
@@ -172,21 +183,16 @@ namespace RbfxTemplate
                 visited.Add(pair.Item1);
                 visited.Add(pair.Item2);
 
-                Tile t1, t2;
+                Tile t1 = CreateTile(pair.Item1);
+                Tile t2 = CreateTile(pair.Item2);
+
+                if (_random.Next(2) == 0)
                 {
-                    var tile = _scene.Ptr.InstantiatePrefab(_tilePrefab);
-                    var model = tile.GetComponent<StaticModel>(true);
-                    model.SetMaterial(_tileMaterials[pair.Item1]);
-                    leftTiles.Add(tile);
-                    t1 = tile.GetComponent<Tile>(true);
+                    (t1, t2) = (t2, t1);
                 }
-                {
-                    var tile = _scene.Ptr.InstantiatePrefab(_tilePrefab);
-                    var model = tile.GetComponent<StaticModel>(true);
-                    model.SetMaterial(_tileMaterials[pair.Item2]);
-                    rightTiles.Add(tile);
-                    t2 = tile.GetComponent<Tile>(true);
-                }
+
+                leftTiles.Add(t1.Node);
+                rightTiles.Add(t2.Node);
                 t1.ValidLink = t2;
                 t2.ValidLink = t1;
 
@@ -205,6 +211,20 @@ namespace RbfxTemplate
                 leftTiles[index].Position = pos + new Vector3(-d, 0, index*d);
                 rightTiles[index].Position = pos + new Vector3(d, 0, index*d);
             }
+
+            _areaSize = new Vector2(5, (leftTiles.Count+1)*d);
+        }
+
+        public Tile CreateTile(string imageName)
+        {
+            var m = _baseMaterial.Clone();
+            var tex = Context.ResourceCache.GetResource<Texture2D>("Images/Emoji/" + imageName+".png");
+            m.SetTexture("Albedo", tex);
+
+            var tile = _scene.Ptr.InstantiatePrefab(_tilePrefab);
+            var model = tile.GetComponent<StaticModel>(true);
+            model.SetMaterial(m);
+            return tile.GetComponent<Tile>(true);
         }
 
         public Ray GetScreenRay(IntVector2 inputMousePosition)
@@ -225,26 +245,39 @@ namespace RbfxTemplate
 
         public void DragTile(Tile tile, int? touchId)
         {
-            _dragSate.TrackTile(tile, touchId);
-            State = _dragSate;
+            _dragState.TrackTile(tile, touchId);
+            State = _dragState;
         }
 
         public void StartPicking()
         {
-            State = _pickSate;
+            State = _pickState;
             foreach (var tile in _currentTiles)
                 if (tile.LinkedTile != tile.ValidLink)
                 {
                     if (_hintsLeft > 0)
                     {
-                        _pickSate.ShowHint(tile);
+                        _pickState.ShowHint(tile);
                         --_hintsLeft;
                     }
 
                     return;
                 }
 
-            NextLevel();
+            Victory();
+        }
+
+        private void Victory()
+        {
+            State = _victoryState;
+            var size = UI.Size;
+            var s = Math.Min(size.X, size.Y) * 0.9f;
+            var imgSize = new Vector2(s, s);
+            _victorySprite.Position = size.ToVector2() *0.5f;
+            _victorySprite.Size = imgSize.ToIntVector2();
+            _victorySprite.IsVisible = true;
+            _victorySprite.Scale = new Vector2(0.1f, 0.1f);
+            ActionManager.AddAction(_victoryAction, _victorySprite);
         }
 
         protected override void Dispose(bool disposing)
@@ -324,8 +357,10 @@ namespace RbfxTemplate
             }
         }
 
-        private void NextLevel()
+        public void NextLevel()
         {
+            //_victorySprite.IsVisible = false;
+
             ++_levelIndex;
             RmlUiComponent.UpdateProperties();
             foreach (var tile in _currentTiles) tile.Node.Remove();

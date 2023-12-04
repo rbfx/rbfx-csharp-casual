@@ -2,13 +2,13 @@
 
 namespace RbfxTemplate.GameStates
 {
-    public class PickSate: StateBase
+    public class PickState: StateBase
     {
         private readonly Node _pointer;
         private Tile _hintTile = null;
         private float _hintTime;
 
-        public PickSate(GameState game, Node pointer) : base(game)
+        public PickState(GameState game, Node pointer) : base(game)
         {
             _pointer = pointer;
             _pointer.SetDeepEnabled(false);

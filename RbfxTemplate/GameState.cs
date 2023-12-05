@@ -52,8 +52,9 @@ namespace RbfxTemplate
         private Vector2 _areaSize = new Vector2(1, 1);
 
         private int _levelIndex;
-        private int _hintsLeft = 1;
+        private int _hintsLeft = 2;
         private bool _victory;
+        private readonly FiniteTimeAction _confettiAnimation;
 
         public GameState(UrhoPluginApplication app) : base(app, "UI/GameScreen.rml")
         {
@@ -86,6 +87,8 @@ namespace RbfxTemplate
             _dragState = new DragState(this);
             _victoryState = new VictoryState(this);
 
+            _confettiAnimation = new ActionBuilder(Context).Enable().ShaderParameterFromTo(1.0f, "AnimationPhase", 0.0f, 1.0f).Disable().Build();
+
             NextLevel(null);
 
             Deactivate();
@@ -108,6 +111,8 @@ namespace RbfxTemplate
         public override void OnDataModelInitialized(GameRmlUIComponent component)
         {
             component.BindDataModelProperty("Level", _ => _.Set("Level " + _levelIndex), _ => { });
+            component.BindDataModelProperty("BaseLevel", _ => _.Set(1+((_levelIndex-1)/5)*5), _ => { });
+            component.BindDataModelProperty("CurrentLevel", _ => _.Set(_levelIndex), _ => { });
             component.BindDataModelProperty("Victory", _ => _.Set(_victory), _ => { });
             component.BindDataModelEvent("Next", NextLevel);
             component.BindDataModelEvent("Settings", Settings);
@@ -253,7 +258,8 @@ namespace RbfxTemplate
                 if (tile.LinkedTile != tile.ValidLink)
                 {
                     isCorrect = false;
-                    hint = tile;
+                    if (hint == null)
+                        hint = tile;
                 }
             }
 
@@ -304,6 +310,12 @@ namespace RbfxTemplate
 
         private void Victory()
         {
+            var nodeList = new NodeList();
+            _scene.Ptr.GetNodesWithTag(nodeList, "Confetti");
+            foreach (var node in nodeList)
+            {
+                ActionManager.AddAction(_confettiAnimation, node);
+            }
             State = _victoryState;
             _victory = true;
             RmlUiComponent.UpdateProperties();

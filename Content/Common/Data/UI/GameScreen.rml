@@ -25,12 +25,20 @@
 			}
 			/* Style of the root panel element */
 			dev.menu-panel {
-			width: 50%; 
+			width: 50%;
 			max-height: 90%;
-			position: absolute; 
-			top: 50%; 
-			left: 50%; 
-			transform: translate(-50%, -50%); 
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			}
+
+			.levelblock {
+			display: inline-block;
+			border-width: 1px;
+			border-color: #fff;
+			margin: 2px;
+			padding: 2px;
 			}
 		</style>
 	</head>
@@ -42,10 +50,17 @@
 				<img sprite="icon-settings"></img>
 			</input>
 			</div>
-			<div style="float: right">
+			<!--<div style="float: right">
 				<img sprite="icon-diamond"></img> 0
-			</div>
+			</div>-->
 			<div style="text-align: center">{{Level}}</div>
+			<div style="text-align: center">
+				<div class="levelblock" style="">{{CurrentLevel > BaseLevel  ? 'V' : BaseLevel}}</div>
+				<div class="levelblock" style="">{{CurrentLevel > BaseLevel+1  ? 'V' : BaseLevel+1}}</div>
+				<div class="levelblock" style="">{{CurrentLevel > BaseLevel+2  ? 'V' : BaseLevel+2}}</div>
+				<div class="levelblock" style="">{{CurrentLevel > BaseLevel+3  ? 'V' : BaseLevel+3}}</div>
+				<div class="levelblock" style="">{{CurrentLevel > BaseLevel+4  ? 'V' : BaseLevel+4}}</div>
+			</div>
 		</div>
 		
 		<div data-visible="Victory" class="" style="background: #000000A0; padding:10px; top: 50%; left: 50%; position: absolute; transform: translate(-50%, -50%); width: 50%; max-height: 90%">

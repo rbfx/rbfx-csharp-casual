@@ -1,0 +1,6 @@
+<technique vs="M_Confetti" ps="M_Confetti">
+    <pass name="base" />
+    <pass name="deferred" />
+    <pass name="depth" vs="M_Confetti" ps="M_Confetti" />
+    <pass name="shadow" vs="M_Confetti" ps="M_Confetti" />
+</technique>

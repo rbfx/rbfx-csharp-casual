@@ -1,0 +1,100 @@
+{
+	"components": [
+		{
+			"_typeName": "Octree"
+		}
+	],
+	"nodes": [
+		{
+			"components": [
+				{
+					"_typeName": "StaticModel",
+					"attributes": [
+						{
+							"name": "Model",
+							"type": "ResourceRef",
+							"value": "Model;Models/Particles.mdl"
+						},
+						{
+							"name": "Material",
+							"type": "ResourceRefList",
+							"value": "Material;Materials/Confetti.material"
+						},
+						{
+							"name": "Cast Shadows",
+							"type": "Bool",
+							"value": true
+						}
+					]
+				}
+			]
+		},
+		{
+			"attributes": [
+				{
+					"name": "Name",
+					"type": "String",
+					"value": "Default Skybox"
+				}
+			],
+			"components": [
+				{
+					"_typeName": "Skybox",
+					"attributes": [
+						{
+							"name": "Model",
+							"type": "ResourceRef",
+							"value": "Model;Models/Box.mdl"
+						},
+						{
+							"name": "Material",
+							"type": "ResourceRefList",
+							"value": "Material;Materials/DefaultSkybox.xml"
+						}
+					]
+				}
+			]
+		},
+		{
+			"attributes": [
+				{
+					"name": "Name",
+					"type": "String",
+					"value": "Default Zone"
+				}
+			],
+			"components": [
+				{
+					"_typeName": "Zone",
+					"attributes": [
+						{
+							"name": "Bounding Box Min",
+							"type": "Vector3",
+							"value": "-1000 -1000 -1000"
+						},
+						{
+							"name": "Bounding Box Max",
+							"type": "Vector3",
+							"value": "1000 1000 1000"
+						},
+						{
+							"name": "Ambient Color",
+							"type": "Color",
+							"value": "0 0 0 1"
+						},
+						{
+							"name": "Background Brightness",
+							"type": "Float",
+							"value": 1.0
+						},
+						{
+							"name": "Zone Texture",
+							"type": "ResourceRef",
+							"value": "TextureCube;Textures/DefaultSkybox.xml"
+						}
+					]
+				}
+			]
+		}
+	]
+}

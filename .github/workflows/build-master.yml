@@ -146,10 +146,10 @@ jobs:
         echo $ANDROID_HOME
         sudo chmod -R a+rw $ANDROID_HOME
 
-    # - name: Fetch AndroidSDKManager
-    #   run: |
-    #     dotnet tool run ezpipeline fetch-tool -n AndroidSDKManager --output $ANDROID_HOME --path --version 9123335
-    #     yes | $ANDROID_HOME/cmdline-tools/bin/sdkmanager --licenses --sdk_root=$ANDROID_HOME
+    - name: Fetch AndroidSDKManager
+      run: |
+        dotnet tool run ezpipeline fetch-tool -n AndroidSDKManager --output $ANDROID_HOME --path --version 9123335
+        yes | $ANDROID_HOME/cmdline-tools/bin/sdkmanager --licenses --sdk_root=$ANDROID_HOME
 
     - name: 'Print Java version'
       run: javac -version
@@ -161,8 +161,8 @@ jobs:
     #     sudo update-java-alternatives --set /usr/lib/jvm/temurin-11-jdk-amd64
     #     javac -version
 
-    # - name: Run sdkmanager
-    #   run: sdkmanager "platform-tools" "platforms;android-33"
+    - name: Install Android SDK and Platforms
+      run: $ANDROID_HOME/cmdline-tools/bin/sdkmanager "platform-tools" "platforms;android-33"
 
     - name: Dotnet Publish
       working-directory: ./RbfxTemplate.Android

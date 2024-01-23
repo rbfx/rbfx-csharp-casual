@@ -135,9 +135,6 @@ jobs:
     - name: Install Workloads
       run: dotnet workload install android 
 
-    - name: Setup Android SDK
-      uses: amyu/setup-android@v4
-
     - name: Restore dependencies
       working-directory: ./RbfxTemplate.Android
       run: dotnet restore

@@ -139,6 +139,9 @@ jobs:
       working-directory: ./RbfxTemplate.Android
       run: dotnet restore
 
+    - name: Fetch AndroidSDKManager
+      run: dotnet tool run ezpipeline fetch-tool AndroidSDKManager
+
     - name: Run sdkmanager
       run: sdkmanager "platform-tools" "platforms;android-33"
 

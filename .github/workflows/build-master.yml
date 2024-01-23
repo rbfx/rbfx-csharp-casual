@@ -139,11 +139,27 @@ jobs:
       working-directory: ./RbfxTemplate.Android
       run: dotnet restore
 
-    - name: Fetch AndroidSDKManager
-      run: dotnet tool run ezpipeline fetch-tool -n AndroidSDKManager -p
+    - name: Install android-sdk
+      shell: bash
+      run: |
+        sudo apt-get install -y wget tar android-sdk unzip tree
+        echo $ANDROID_HOME
+        sudo chmod -R a+rw $ANDROID_HOME
 
-    - name: Run sdkmanager
-      run: sdkmanager "platform-tools" "platforms;android-33"
+    - name: Fetch AndroidSDKManager
+      run: |
+        dotnet tool run ezpipeline fetch-tool -n AndroidSDKManager --output $ANDROID_HOME --path --version 9123335
+        yes | $ANDROID_HOME/cmdline-tools/bin/sdkmanager --licenses --sdk_root=$ANDROID_HOME
+
+    - name: 'Switch to Java 11'
+      run: |
+        javac -version
+        sudo update-java-alternatives --list
+        sudo update-java-alternatives --set /usr/lib/jvm/temurin-11-jdk-amd64
+        javac -version
+
+    # - name: Run sdkmanager
+    #   run: sdkmanager "platform-tools" "platforms;android-33"
 
     - name: Dotnet Publish
       working-directory: ./RbfxTemplate.Android

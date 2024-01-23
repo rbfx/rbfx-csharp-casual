@@ -146,10 +146,10 @@ jobs:
         echo $ANDROID_HOME
         sudo chmod -R a+rw $ANDROID_HOME
 
-    - name: Fetch AndroidSDKManager
-      run: |
-        dotnet tool run ezpipeline fetch-tool -n AndroidSDKManager --output $ANDROID_HOME --path --version 9123335
-        yes | $ANDROID_HOME/cmdline-tools/bin/sdkmanager --licenses --sdk_root=$ANDROID_HOME
+    # - name: Fetch AndroidSDKManager
+    #   run: |
+    #     dotnet tool run ezpipeline fetch-tool -n AndroidSDKManager --output $ANDROID_HOME --path --version 9123335
+    #     yes | $ANDROID_HOME/cmdline-tools/bin/sdkmanager --licenses --sdk_root=$ANDROID_HOME
 
     - name: 'Print Java version'
       run: javac -version
@@ -166,7 +166,7 @@ jobs:
 
     - name: Dotnet Publish
       working-directory: ./RbfxTemplate.Android
-      run: dotnet publish -f net7.0-android33 -c Release --no-restore -p:AndroidVersionCode=${{ needs.set_version.outputs.ANDROID_VERSION }} -p:Version=${{ needs.set_version.outputs.BUILD_VERSION }}
+      run: dotnet publish -f net7.0-android33 -c Release --no-restore -p:AndroidVersionCode=${{ needs.set_version.outputs.ANDROID_VERSION }} -pAndroidSdkDirectory=$ANDROID_HOME -p:Version=${{ needs.set_version.outputs.BUILD_VERSION }}
 
     - name: Release
       uses: softprops/action-gh-release@v1

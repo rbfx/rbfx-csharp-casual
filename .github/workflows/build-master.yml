@@ -140,7 +140,7 @@ jobs:
       run: dotnet restore
 
     - name: Fetch AndroidSDKManager
-      run: dotnet tool run ezpipeline fetch-tool AndroidSDKManager
+      run: dotnet tool run ezpipeline fetch-tool -n AndroidSDKManager -p
 
     - name: Run sdkmanager
       run: sdkmanager "platform-tools" "platforms;android-33"

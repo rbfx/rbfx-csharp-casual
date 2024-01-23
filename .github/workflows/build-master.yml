@@ -139,6 +139,9 @@ jobs:
       working-directory: ./RbfxTemplate.Android
       run: dotnet restore
 
+    - name: Run sdkmanager
+      run: sdkmanager "platform-tools" "platforms;android-33"
+
     - name: Dotnet Publish
       working-directory: ./RbfxTemplate.Android
       run: dotnet publish -f net7.0-android33 -c Release --no-restore -p:AndroidVersionCode=${{ needs.set_version.outputs.ANDROID_VERSION }} -p:Version=${{ needs.set_version.outputs.BUILD_VERSION }}

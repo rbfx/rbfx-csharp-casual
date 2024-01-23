@@ -162,7 +162,7 @@ jobs:
     #     javac -version
 
     - name: Install Android SDK and Platforms
-      run: $ANDROID_HOME/cmdline-tools/bin/sdkmanager "platform-tools" "platforms;android-33"
+      run: $ANDROID_HOME/cmdline-tools/bin/sdkmanager "platform-tools" "platforms;android-33" --sdk_root=$ANDROID_HOME
 
     - name: Dotnet Publish
       working-directory: ./RbfxTemplate.Android

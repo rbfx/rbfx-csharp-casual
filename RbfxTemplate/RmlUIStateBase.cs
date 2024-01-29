@@ -8,6 +8,7 @@ namespace RbfxTemplate
     public abstract class RmlUIStateBase : ApplicationState
     {
         private readonly SharedPtr<Scene> _scene;
+        private readonly GameRmlUIComponent _uiComponent;
 
         /// <summary>
         ///     Construct RmlUIStateBase.
@@ -21,20 +22,21 @@ namespace RbfxTemplate
             Application = app;
 
             _scene = Context.CreateObject<Scene>();
-            RmlUiComponent = _scene.Ptr.CreateComponent<GameRmlUIComponent>();
-            RmlUiComponent.IsEnabled = false;
-            RmlUiComponent.State = this;
-            RmlUiComponent.SetResource(rmlResource);
-            RmlUiComponent.IsEnabled = false;
+            _uiComponent = new GameRmlUIComponent(Context);
+            _uiComponent.IsEnabled = false;
+            _uiComponent.State = this;
+            _uiComponent.SetResource(rmlResource);
+            _uiComponent.IsEnabled = false;
+            _scene.Ptr.AddComponent(_uiComponent,0);
         }
 
         /// <summary>
-        ///     RmlUI Component for the game state.
+        /// RmlUI Component for the game state.
         /// </summary>
-        public GameRmlUIComponent RmlUiComponent { get; }
+        public GameRmlUIComponent RmlUiComponent => _uiComponent;
 
         /// <summary>
-        ///     Application instance.
+        /// Application instance.
         /// </summary>
         public UrhoPluginApplication Application { get; }
 
@@ -50,8 +52,8 @@ namespace RbfxTemplate
         /// <param name="bundle">Game state parameters.</param>
         public override void Activate(StringVariantMap bundle)
         {
-            RmlUiComponent.IsEnabled = true;
-            RmlUiComponent.UpdateProperties();
+            _uiComponent.IsEnabled = true;
+            _uiComponent.UpdateProperties();
             SubscribeToEvent(E.KeyUp, HandleKeyUp);
             base.Activate(bundle);
         }
@@ -61,7 +63,7 @@ namespace RbfxTemplate
         /// </summary>
         public override void Deactivate()
         {
-            RmlUiComponent.IsEnabled = false;
+            _uiComponent.IsEnabled = false;
             UnsubscribeFromEvent(E.KeyUp);
             base.Deactivate();
         }

@@ -4,8 +4,9 @@ namespace RbfxTemplate.GameStates
 {
     public class DragState : StateBase
     {
+        InteractionKey? _interactionKey;
+
         private Tile _tile;
-        private int? _touchId;
 
         public DragState(GameState game) : base(game)
         {
@@ -13,47 +14,48 @@ namespace RbfxTemplate.GameStates
 
         public override void Activate()
         {
-            _tile.Link.IsEnabled = true;
+            if (_tile != null)
+            {
+                _tile.Link.IsEnabled = true;
+            }
+
             base.Activate();
         }
 
-        public override void Deactivate()
+        public override void EndInteraction(InteractionKey interactionKey, IntVector2 interactionPosition)
         {
-            base.Deactivate();
+            if (interactionKey != _interactionKey)
+                return;
+
+            CompleteLink(interactionPosition);
+            _interactionKey = null;
         }
 
-        public override void HandleMouseMove(IntVector2 intVector2, int buttons, int qualifiers)
+        public override void CancelInteraction(InteractionKey interactionKey, IntVector2 interactionPosition)
         {
-            if (_touchId.HasValue) return;
+            if (interactionKey != _interactionKey)
+                return;
 
-            MoveLink(intVector2);
+            _interactionKey = null;
+            Game.StartPicking();
         }
 
-        public override void HandleMouseUp(int button, IntVector2 inputMousePosition, int buttons, int qualifiers)
+        public override void UpdateInteraction(InteractionKey interactionKey, IntVector2 interactionPosition)
         {
-            if (_touchId.HasValue) return;
+            if (interactionKey != _interactionKey)
+                return;
 
-            CompleteLink(inputMousePosition);
+            MoveLink(interactionPosition);
         }
 
-        public override void HandleTouchMove(int touchId, IntVector2 intVector2)
+        public override void Update(float timeStep)
         {
-            if (_touchId != touchId) return;
-
-            MoveLink(intVector2);
         }
 
-        public override void HandleTouchEnd(int touchId, IntVector2 intVector2)
-        {
-            if (_touchId != touchId) return;
-
-            CompleteLink(intVector2);
-        }
-
-        public void TrackTile(Tile tile, int? touchId)
+        public void TrackTile(Tile tile, InteractionKey interactionKey)
         {
             _tile = tile;
-            _touchId = touchId;
+            _interactionKey = interactionKey;
             tile.LinkTo(null);
             var material = Context.ResourceCache.GetResource<Material>("Materials/White.material");
             tile.Link.GetComponent<AnimatedModel>(true).SetMaterial(material);

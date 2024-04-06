@@ -22,6 +22,16 @@ namespace RbfxTemplate
         private readonly Random _random = new Random();
         private readonly List<Tile> _currentTiles = new List<Tile>();
 
+        /// <summary>
+        /// State interaction manager. Track active interactions.
+        /// </summary>
+        private readonly StatePointerInteractionManager _stateManager;
+
+        /// <summary>
+        /// Input adapter to handle arrow keys.
+        /// </summary>
+        private readonly DirectionalPadAdapter _directionalPad;
+
         private readonly Tuple<string, string>[] _pairs =
         {
             Tuple.Create("emoji_u1f436", "emoji_u1f431"),
@@ -63,6 +73,10 @@ namespace RbfxTemplate
 
             _raycastResult = new PhysicsRaycastResult();
 
+            // Initialize state interaction manager.
+            _stateManager = new StatePointerInteractionManager();
+            _stateManager.LastKnownMousePosition = Input.MousePosition;
+
             _app = app;
             _scene = Context.CreateObject<Scene>();
             _scene.Ptr.LoadXML("Scenes/Scene.scene");
@@ -87,25 +101,13 @@ namespace RbfxTemplate
             _dragState = new DragState(this);
             _victoryState = new VictoryState(this);
 
+            _directionalPad = new DirectionalPadAdapter(Context);
+
             _confettiAnimation = new ActionBuilder(Context).Enable().ShaderParameterFromTo(1.0f, "AnimationPhase", 0.0f, 1.0f).Disable().Build();
 
             NextLevel(null);
 
             Deactivate();
-        }
-
-        public StateBase State
-        {
-            get => _state;
-            set
-            {
-                if (_state != value)
-                {
-                    _state?.Deactivate();
-                    _state = value;
-                    _state?.Activate();
-                }
-            }
         }
 
         public override void OnDataModelInitialized(GameRmlUIComponent component)
@@ -125,7 +127,7 @@ namespace RbfxTemplate
 
         public override void Activate(StringVariantMap bundle)
         {
-            SubscribeToEvent(E.KeyUp, HandleKeyUp);
+            SubscribeToEvent(E.KeyUp, HandleEscKeyUp);
 
             SubscribeToEvent(E.MouseButtonDown, HandleMouseDown);
             SubscribeToEvent(E.MouseButtonUp, HandleMouseUp);
@@ -135,6 +137,8 @@ namespace RbfxTemplate
             SubscribeToEvent(E.TouchEnd, HandleTouchEnd);
             SubscribeToEvent(E.TouchMove, HandleTouchMove);
 
+            _directionalPad.IsEnabled = true;
+
             _scene.Ptr.IsUpdateEnabled = true;
 
 
@@ -143,7 +147,7 @@ namespace RbfxTemplate
 
         public override void Update(float timeStep)
         {
-            _state.Update(timeStep);
+            _stateManager.State.Update(timeStep);
 
             var orthoSizeY = _areaSize.Y;
             var orthoSizeX = _areaSize.X * UI.Size.Y / UI.Size.X;
@@ -238,15 +242,15 @@ namespace RbfxTemplate
             return null;
         }
 
-        public void DragTile(Tile tile, int? touchId)
+        public void DragTile(Tile tile, InteractionKey interactionKey)
         {
-            _dragState.TrackTile(tile, touchId);
-            State = _dragState;
+            _dragState.TrackTile(tile, interactionKey);
+            _stateManager.State = _dragState;
         }
 
         public void StartPicking()
         {
-            State = _pickState;
+            _stateManager.State = _pickState;
 
             var isComplete = true;
             var isCorrect = true;
@@ -316,7 +320,7 @@ namespace RbfxTemplate
             {
                 ActionManager.AddAction(_confettiAnimation, node);
             }
-            State = _victoryState;
+            _stateManager.State = _victoryState;
             _victory = true;
             RmlUiComponent.UpdateProperties();
         }
@@ -332,54 +336,55 @@ namespace RbfxTemplate
 
         private void HandleTouchBegin(VariantMap args)
         {
-            var touchId = args[E.TouchBegin.TouchID].Int;
-            var x = args[E.TouchBegin.X].Int;
-            var y = args[E.TouchBegin.Y].Int;
-            _state.HandleTouchBegin(touchId, new IntVector2(x, y));
+            _stateManager.HandleTouchBegin(args);
         }
 
         private void HandleTouchEnd(VariantMap args)
         {
-            var touchId = args[E.TouchEnd.TouchID].Int;
-            var x = args[E.TouchEnd.X].Int;
-            var y = args[E.TouchEnd.Y].Int;
-            _state.HandleTouchEnd(touchId, new IntVector2(x, y));
+            _stateManager.HandleTouchEnd(args);
         }
 
         private void HandleTouchMove(VariantMap args)
         {
-            var touchId = args[E.TouchMove.TouchID].Int;
-            var x = args[E.TouchMove.X].Int;
-            var y = args[E.TouchMove.Y].Int;
-            _state.HandleTouchMove(touchId, new IntVector2(x, y));
+            _stateManager.HandleTouchMove(args);
         }
 
         private void HandleMouseMove(VariantMap args)
         {
-            var buttons = args[E.MouseMove.Buttons].Int;
-            var qualifiers = args[E.MouseMove.Qualifiers].Int;
-            var x = args[E.MouseMove.X].Int;
-            var y = args[E.MouseMove.Y].Int;
-            _state.HandleMouseMove(new IntVector2(x, y), buttons, qualifiers);
+            _stateManager.HandleMouseMove(args);
         }
 
-        private void HandleMouseUp(StringHash arg1, VariantMap args)
+        private void HandleMouseUp(VariantMap args)
         {
-            var buttons = args[E.MouseButtonUp.Buttons].Int;
-            var qualifiers = args[E.MouseButtonUp.Qualifiers].Int;
-            var button = args[E.MouseButtonUp.Button].Int;
-            _state.HandleMouseUp(button, Context.Input.MousePosition, buttons, qualifiers);
+            _stateManager.HandleMouseUp(args);
         }
 
-        private void HandleMouseDown(StringHash arg1, VariantMap args)
+        private void HandleMouseDown(VariantMap args)
         {
-            var buttons = args[E.MouseButtonDown.Buttons].Int;
-            var qualifiers = args[E.MouseButtonDown.Qualifiers].Int;
-            var button = args[E.MouseButtonDown.Button].Int;
-            _state.HandleMouseDown(button, Context.Input.MousePosition, buttons, qualifiers);
+            _stateManager.HandleMouseDown(args);
         }
 
-        private void HandleKeyUp(VariantMap args)
+        private void HandleDpadKeyDown(VariantMap args)
+        {
+            var scanCode =(Scancode)args[E.KeyUp.Scancode].Int;
+            switch (scanCode)
+            {
+                case Scancode.ScancodeUp:
+                    _stateManager.HandleDpad(HatPosition.HatUp);
+                    break;
+                case Scancode.ScancodeDown:
+                    _stateManager.HandleDpad(HatPosition.HatDown);
+                    break;
+                case Scancode.ScancodeLeft:
+                    _stateManager.HandleDpad(HatPosition.HatLeft);
+                    break;
+                case Scancode.ScancodeRight:
+                    _stateManager.HandleDpad(HatPosition.HatRight);
+                    break;
+            }
+        }
+
+        private void HandleEscKeyUp(VariantMap args)
         {
             var key = (Key)args[E.KeyUp.Key].Int;
             switch (key)

@@ -14,14 +14,12 @@ namespace RbfxTemplate.GameStates
             _pointer.SetDeepEnabled(false);
         }
 
-        public override void HandleMouseDown(int button, IntVector2 inputMousePosition, int buttons, int qualifiers)
+        public override void StartInteraction(InteractionKey interactionKey, IntVector2 interactionPosition)
         {
-            if (button != 1) return;
-
-            var tile = Game.PickTile(inputMousePosition);
+            var tile = Game.PickTile(interactionPosition);
             if (tile != null)
             {
-                Game.DragTile(tile, null);
+                Game.DragTile(tile, interactionKey);
                 _pointer.SetDeepEnabled(false);
                 _hintTile = null;
             }
@@ -38,17 +36,6 @@ namespace RbfxTemplate.GameStates
                 var a = _hintTile.Node.WorldPosition;
                 var b = _hintTile.ValidLink.Node.WorldPosition;
                 _pointer.WorldPosition = a.Lerp(b, _hintTime);
-            }
-        }
-
-        public override void HandleTouchBegin(int touchId, IntVector2 touchPosition)
-        {
-            var tile = Game.PickTile(touchPosition);
-            if (tile != null)
-            {
-                Game.DragTile(tile, touchId);
-                _pointer.SetDeepEnabled(false);
-                _hintTile = null;
             }
         }
 

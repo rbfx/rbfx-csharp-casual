@@ -15,7 +15,7 @@ namespace RbfxTemplate
             base.OnResume();
         }
 
-        protected override void OnCreate(Bundle savedInstanceState)
+        protected override void OnCreate(Bundle? savedInstanceState)
         {
             //Launcher.SdlTrapBackButton = true;
             Launcher.Run(_ => new UrhoApplication(_));

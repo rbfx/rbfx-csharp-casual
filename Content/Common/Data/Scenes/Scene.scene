@@ -1,9 +1,8 @@
 <?xml version="1.0"?>
 <resource _id="1">
 	<attributes>
-		<attribute name="Elapsed Time" type="Float" value="242.906815" />
 		<attribute name="Next Node ID" type="Int" value="29" />
-		<attribute name="Next Component ID" type="Int" value="52" />
+		<attribute name="Next Component ID" type="Int" value="63" />
 	</attributes>
 	<components>
 		<component _id="1" _typeName="Octree" />
@@ -16,6 +15,15 @@
 		</component>
 		<component _id="11" _typeName="ReflectionProbeManager" />
 		<component _id="32" _typeName="PhysicsWorld" />
+		<component _id="62" _typeName="SoundSource">
+			<attributes>
+				<attribute name="Sound" type="ResourceRef" value="Sound;Music/music.ogg" />
+				<attribute name="Type" type="String" value="Music" />
+				<attribute name="Frequency" type="Float" value="48000.000000" />
+				<attribute name="Is Playing" type="Bool" value="true" />
+				<attribute name="Play Position" type="Int" value="-1550372864" />
+			</attributes>
+		</component>
 	</components>
 	<nodes>
 		<node _id="2">

@@ -2,7 +2,7 @@
 <resource _id="1">
 	<attributes>
 		<attribute name="Next Node ID" type="Int" value="29" />
-		<attribute name="Next Component ID" type="Int" value="63" />
+		<attribute name="Next Component ID" type="Int" value="74" />
 	</attributes>
 	<components>
 		<component _id="1" _typeName="Octree" />
@@ -21,7 +21,7 @@
 				<attribute name="Type" type="String" value="Music" />
 				<attribute name="Frequency" type="Float" value="48000.000000" />
 				<attribute name="Is Playing" type="Bool" value="true" />
-				<attribute name="Play Position" type="Int" value="-1550372864" />
+				<attribute name="Play Position" type="Int" value="202423472" />
 			</attributes>
 		</component>
 	</components>
@@ -73,7 +73,7 @@
 		<node _id="7">
 			<attributes>
 				<attribute name="Name" type="String" value="Main Camera" />
-				<attribute name="Position" type="Vector3" value="0 2 0" />
+				<attribute name="Position" type="Vector3" value="2.98023e-08 2 1.19209e-06" />
 				<attribute name="Rotation" type="Quaternion" value="0.707107 0.707107 0 0" />
 			</attributes>
 			<components>
@@ -82,7 +82,13 @@
 						<attribute name="Near Clip" type="Float" value="0.000000" />
 						<attribute name="Far Clip" type="Float" value="10.000000" />
 						<attribute name="Orthographic" type="Bool" value="true" />
-						<attribute name="Orthographic Size" type="Float" value="5.000000" />
+						<attribute name="Orthographic Size" type="Float" value="2.200000" />
+					</attributes>
+				</component>
+				<component _id="73" _typeName="CameraOperator">
+					<attributes>
+						<attribute name="Padding" type="Vector4" value="0.1 0.1 0.1 0.1" />
+						<attribute name="Track Bounding Box" type="Bool" value="true" />
 					</attributes>
 				</component>
 			</components>

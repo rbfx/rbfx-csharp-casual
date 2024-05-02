@@ -13,6 +13,7 @@ namespace RbfxTemplate
         private readonly UrhoPluginApplication _app;
         private readonly Node _cameraNode;
         private readonly Camera _camera;
+        private readonly CameraOperator _cameraOperator;
         private readonly Viewport _viewport;
         private readonly PrefabResource _tilePrefab;
 
@@ -59,7 +60,6 @@ namespace RbfxTemplate
         private readonly PhysicsRaycastResult _raycastResult;
         private readonly Material _baseMaterial;
         private StateBase _state;
-        private Vector2 _areaSize = new Vector2(1, 1);
 
         private int _levelIndex;
         private int _hintsLeft = 2;
@@ -84,6 +84,7 @@ namespace RbfxTemplate
             _cameraNode = _scene.Ptr.GetChild("Main Camera");
             _viewport = Context.CreateObject<Viewport>();
             _camera = _cameraNode?.GetComponent<Camera>();
+            _cameraOperator = _cameraNode?.GetComponent<CameraOperator>();
             _viewport.Camera = _camera;
             _viewport.Scene = _scene;
             SetViewport(0, _viewport);
@@ -148,10 +149,6 @@ namespace RbfxTemplate
         public override void Update(float timeStep)
         {
             _stateManager.State.Update(timeStep);
-
-            var orthoSizeY = _areaSize.Y;
-            var orthoSizeX = _areaSize.X * UI.Size.Y / UI.Size.X;
-            _camera.OrthoSize = Math.Max(orthoSizeX, orthoSizeY);
         }
 
         public override void Deactivate()
@@ -211,7 +208,8 @@ namespace RbfxTemplate
                 rightTiles[index].Position = pos + new Vector3(d, 0, index * d);
             }
 
-            _areaSize = new Vector2(5, (leftTiles.Count + 1) * d);
+            var size = new Vector3(5, 1, (leftTiles.Count + 1) * d);
+            _cameraOperator.BoundingBox = new BoundingBox(size*-0.5f, size*0.5f);
         }
 
         public Tile CreateTile(string imageName)

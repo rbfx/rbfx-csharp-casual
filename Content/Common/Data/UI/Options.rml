@@ -36,43 +36,13 @@
 		</style>
 	</head>
 
-	<body data-model="MenuComponent"  style="width: 100%; height: 100%; margin: 0; decorator: image(../Images/Background.png); nav: auto">
+	<body data-model="GameRmlUIComponent"  style="width: 100%; height: 100%; margin: 0; decorator: image(../Images/Background.png); nav: auto">
 		<div class="gray-inner-panel menu-panel" style="top: 50%; left: 50%; position: absolute; transform: translate(-50%, -50%); max-height: 90%; max-height: 90%; min-width: 800px">
 			<div style="text-align: center">Settings</div>
 			<br/>
 			<table>
 				<col style="text-align: right; "/>
 				<col style="text-align: left; "/>
-				<tr>
-					<td>
-						<label for="bloom">Bloom</label>
-					</td>
-					<td>
-						<input id="bloom" type="checkbox" class="blue-checkbox" data-checked="bloom"/>
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<label for="ssao">SSAO</label>
-					</td>
-					<td>
-						<input id="ssao" type="checkbox" class="blue-checkbox" data-checked="ssao" />
-					</td>
-				</tr>
-				<!--<tr>
-					<td>
-						<label for="shadow">Shadow quality</label>
-					</td>
-					<td>
-						<navigable group="main_menu_group" onnavigated="sound:Sounds/UINavigated.wav" onpressed="sound:Sounds/UIClicked.wav"  style="display: block">
-							<select id="shadow" class="blue-button" data-value="shadows" style="width: 300px; display: inline-block;">
-								<option value="0">Low</option>
-								<option value="1">Medium</option>
-								<option value="2">High</option>
-							</select>
-						</navigable>
-					</td>
-				</tr>-->
 				<tr>
 					<td>
 						<label for="musmasteric">Master</label>

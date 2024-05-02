@@ -40,13 +40,51 @@ namespace RbfxTemplate
             EngineParameters[Urho3D.EpConfigName] = "";
             EngineParameters[Urho3D.EpOrientations] = "LandscapeLeft LandscapeRight Portrait";
 
-            // Run shaders via SpirV-Cross to eliminate potential driver bugs
-            //EngineParameters[Urho3D.EpShaderPolicy] = 0;
-            // Enable this if you need to debug translated shaders.
-            //EngineParameters[Urho3D.EpShaderLogSources] = true;
+            ApplyCommandLineArguments();
 
             base.Setup();
         }
+
+        private void ApplyCommandLineArguments()
+        {
+            try
+            {
+                var commandLineArgs = Environment.GetCommandLineArgs();
+                for (var index = 0; index < commandLineArgs.Length; index++)
+                {
+                    switch (commandLineArgs[index])
+                    {
+                        case "--log-shader-sources": EngineParameters[Urho3D.EpShaderLogSources] = true; break;
+                        case "--discard-shader-cache": EngineParameters[Urho3D.EpDiscardShaderCache] = true; break;
+                        case "--no-save-shader-cache": EngineParameters[Urho3D.EpSaveShaderCache] = false; break;
+                        case "--d3d11": EngineParameters[Urho3D.EpRenderBackend] = (int)RenderBackend.D3D11; break;
+                        case "--d3d12": EngineParameters[Urho3D.EpRenderBackend] = (int)RenderBackend.D3D12; break;
+                        case "--opengl": EngineParameters[Urho3D.EpRenderBackend] = (int)RenderBackend.OpenGl; break;
+                        case "--vulkan": EngineParameters[Urho3D.EpRenderBackend] = (int)RenderBackend.Vulkan; break;
+                        case "--fullscreen":
+                            {
+                                EngineParameters[Urho3D.EpFullScreen] = true;
+                                EngineParameters[Urho3D.EpWindowResizable] = false;
+                                EngineParameters[Urho3D.EpBorderless] = true;
+                                break;
+                            }
+                        case "--windowed":
+                            {
+                                EngineParameters[Urho3D.EpFullScreen] = false;
+                                EngineParameters[Urho3D.EpWindowResizable] = true;
+                                EngineParameters[Urho3D.EpBorderless] = false;
+                                break;
+                            }
+                        default: Log.Warning("Unknown argument " + commandLineArgs[index]); break;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error(e.Message);
+            }
+        }
+
 
         /// <summary>
         ///     Start application.

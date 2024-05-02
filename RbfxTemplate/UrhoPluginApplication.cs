@@ -18,6 +18,12 @@ namespace RbfxTemplate
             new FileIdentifier("conf", "PrivacyPolicyAccepted");
 
         /// <summary>
+        ///     Settings identifier
+        /// </summary>
+        private static readonly FileIdentifier settingsFileId_ =
+            new FileIdentifier("conf", "Settings");
+
+        /// <summary>
         ///     Safe pointer to game screen.
         /// </summary>
         private SharedPtr<GameState> _gameState;
@@ -37,6 +43,11 @@ namespace RbfxTemplate
         }
 
         /// <summary>
+        ///     Gets or sets the settings file.
+        /// </summary>
+        public GameSettings Settings { get; set; }
+
+        /// <summary>
         ///     Gets a value indicating whether the game is running.
         /// </summary>
         public bool IsGameRunning => _gameState;
@@ -45,7 +56,6 @@ namespace RbfxTemplate
         {
             return true;
         }
-
 
         /// <summary>
         ///     Transition to game
@@ -119,13 +129,6 @@ namespace RbfxTemplate
             var stateManager = Context.GetSubsystem<StateManager>();
             stateManager.FadeInDuration = 0.1f;
             stateManager.FadeOutDuration = 0.1f;
-
-            //StringList stringList = new StringList();
-            //Context.VirtualFileSystem.Scan(stringList, new FileIdentifier("", "Images/Emoji"), "*.png", ScanFlag.ScanFiles);
-            //foreach (var imageName in stringList)
-            //{
-            //    Context.ResourceCache.BackgroundLoadResource(nameof(Texture2D), "Images/Emoji/" + imageName);
-            //}
 
             // Setup end enqueue splash screen.
             using (SharedPtr<SplashScreen> splash = new SplashScreen(Context))

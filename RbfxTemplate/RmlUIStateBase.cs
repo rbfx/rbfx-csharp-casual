@@ -18,7 +18,6 @@ namespace RbfxTemplate
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
-
         /// <summary>
         /// Construct RmlUIStateBase.
         /// </summary>
@@ -56,7 +55,7 @@ namespace RbfxTemplate
         public abstract void OnDataModelInitialized(GameRmlUIComponent component);
 
         /// <summary>
-        ///     Game state activation handler.
+        /// Game state activation handler.
         /// </summary>
         /// <param name="bundle">Game state parameters.</param>
         public override void Activate(StringVariantMap bundle)
@@ -68,7 +67,7 @@ namespace RbfxTemplate
         }
 
         /// <summary>
-        ///     Game state deactivation handler.
+        /// Game state deactivation handler.
         /// </summary>
         public override void Deactivate()
         {
@@ -78,7 +77,7 @@ namespace RbfxTemplate
         }
 
         /// <summary>
-        ///     Key up handler to navigate back in the game state hierarchy.
+        /// Key up handler to navigate back in the game state hierarchy.
         /// </summary>
         /// <param name="args"></param>
         private void HandleKeyUp(VariantMap args)

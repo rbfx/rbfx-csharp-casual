@@ -21,7 +21,6 @@ namespace RbfxTemplate
                 val => Settings.MusicVolume = val.Float);
             menuComponent.BindDataModelProperty("effects", val => val.Set(Settings.EffectVolume),
                 val => Settings.EffectVolume = val.Float);
-            //menuComponent.BindDataModelProperty("shadows", val => val.Set(_shadowsQuality), (val) => _shadowsQuality = val.Convert(VariantType.VarInt).Int);
         }
 
         public override void Activate(StringVariantMap bundle)
@@ -40,15 +39,15 @@ namespace RbfxTemplate
 
         private void OnCancel(VariantList obj)
         {
-            Application.HandleBackKey();
+            Application.ResetSettings();
 
-            //Application.Settings = GameSettings.Load(Context);
+            Application.HandleBackKey();
         }
 
         private void OnApply(VariantList obj)
         {
             Settings.Apply(Context);
-            //Settings.Save(Context);
+            Application.SaveSettings();
 
             Application.HandleBackKey();
         }

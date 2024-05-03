@@ -1,6 +1,4 @@
-﻿using System;
-using System.Globalization;
-using Urho3DNet;
+﻿using Urho3DNet;
 
 namespace RbfxTemplate
 {
@@ -12,18 +10,6 @@ namespace RbfxTemplate
     public class UrhoPluginApplication : PluginApplication
     {
         /// <summary>
-        ///     PrivacyPolicyAccepted identifier
-        /// </summary>
-        private static readonly FileIdentifier privacyPolicyAcceptedFileId_ =
-            new FileIdentifier("conf", "PrivacyPolicyAccepted");
-
-        /// <summary>
-        ///     Settings identifier
-        /// </summary>
-        private static readonly FileIdentifier settingsFileId_ =
-            new FileIdentifier("conf", "Settings");
-
-        /// <summary>
         ///     Safe pointer to game screen.
         /// </summary>
         private SharedPtr<GameState> _gameState;
@@ -34,27 +20,108 @@ namespace RbfxTemplate
         private SharedPtr<MainMenuState> _mainMenuState;
 
         /// <summary>
+        ///     Safe pointer to settings screen.
+        /// </summary>
+        private SharedPtr<SettingsMenuState> _settingsMenuState;
+
+        /// <summary>
         ///     Application state manager.
         /// </summary>
         private StateStack _stateStack;
+
+        private SharedPtr<ConfigFileContainer<GameSettings>> _settings;
+
 
         public UrhoPluginApplication(Context context) : base(context)
         {
         }
 
         /// <summary>
-        ///     Gets or sets the settings file.
+        ///     Game settings
         /// </summary>
-        public GameSettings Settings { get; set; }
+        public GameSettings Settings => _settings.Ptr.Value;
 
         /// <summary>
         ///     Gets a value indicating whether the game is running.
         /// </summary>
         public bool IsGameRunning => _gameState;
 
+        protected override void Load()
+        {
+            Context.RegisterFactories(GetType().Assembly);
+        }
+
+        protected override void Unload()
+        {
+            Context.RemoveFactories(GetType().Assembly);
+        }
+
+        protected override void Suspend(Archive output)
+        {
+            base.Suspend(output);
+        }
+
+        protected override void Resume(Archive input, bool differentVersion)
+        {
+            base.Resume(input, differentVersion);
+        }
+
         public override bool IsMain()
         {
             return true;
+        }
+
+        protected override void Start(bool isMain)
+        {
+            // Load settings.
+            ResetSettings();
+
+            _stateStack = new StateStack(Context.GetSubsystem<StateManager>());
+
+            _mainMenuState = new MainMenuState(this);
+
+            // Setup state manager.
+            var stateManager = Context.GetSubsystem<StateManager>();
+            stateManager.FadeInDuration = 0.1f;
+            stateManager.FadeOutDuration = 0.1f;
+
+            // Setup end enqueue splash screen.
+            using (SharedPtr<SplashScreen> splash = new SplashScreen(Context))
+            {
+                splash.Ptr.Duration = 1.0f;
+                splash.Ptr.BackgroundImage = Context.ResourceCache.GetResource<Texture2D>("Images/Background.png");
+                splash.Ptr.ForegroundImage = Context.ResourceCache.GetResource<Texture2D>("Images/Splash.png");
+                stateManager.EnqueueState(splash);
+            }
+
+            if (!Settings.PrivacyPolicyAccepted.HasValue)
+            {
+                _stateStack.Push(new AcceptPrivacyPolicyState(this));
+            }
+            else
+            {
+                // Crate end enqueue main menu screen.
+                _stateStack.Push(_mainMenuState);
+            }
+
+            base.Start(isMain);
+        }
+
+        protected override void Stop()
+        {
+            _mainMenuState?.Dispose();
+            _gameState?.Dispose();
+
+            base.Stop();
+        }
+
+        /// <summary>
+        ///     Transition to settings menu
+        /// </summary>
+        public void ToSettings()
+        {
+            _settingsMenuState = _settingsMenuState ?? new SettingsMenuState(this);
+            _stateStack.Push(_settingsMenuState);
         }
 
         /// <summary>
@@ -92,7 +159,8 @@ namespace RbfxTemplate
             }
             else
             {
-                _stateStack.Pop();
+                if (_stateStack.Count > 1)
+                    _stateStack.Pop();
             }
         }
 
@@ -101,74 +169,35 @@ namespace RbfxTemplate
         /// </summary>
         public void AcceptPrivacyPolicy()
         {
-            // Create file marker that privacy policy was accepted.
-            Context.VirtualFileSystem.WriteAllText(privacyPolicyAcceptedFileId_,
-                DateTime.Now.ToString(CultureInfo.InvariantCulture));
+            Settings.PrivacyPolicyAccepted = true;
+            SaveSettings();
 
             // Crate end enqueue main menu screen.
-            _mainMenuState = _mainMenuState ?? new MainMenuState(this);
+            _stateStack.Switch(_mainMenuState);
+        }
+
+        /// <summary>
+        ///     Mark privacy policy as rejected and go to main menu.
+        /// </summary>
+        public void RejectPrivacyPolicy()
+        {
+            Settings.PrivacyPolicyAccepted = false;
+            SaveSettings();
+
+            // Crate end enqueue main menu screen.
             _stateStack.Switch(_mainMenuState);
         }
 
 
-        protected override void Load()
+        public void SaveSettings()
         {
-            Context.RegisterFactories(GetType().Assembly);
+            _settings.Ptr.SaveConfig();
         }
 
-        protected override void Unload()
+        public void ResetSettings()
         {
-            Context.RemoveFactories(GetType().Assembly);
-        }
-
-        protected override void Start(bool isMain)
-        {
-            _stateStack = new StateStack(Context.GetSubsystem<StateManager>());
-
-            // Setup state manager.
-            var stateManager = Context.GetSubsystem<StateManager>();
-            stateManager.FadeInDuration = 0.1f;
-            stateManager.FadeOutDuration = 0.1f;
-
-            // Setup end enqueue splash screen.
-            using (SharedPtr<SplashScreen> splash = new SplashScreen(Context))
-            {
-                splash.Ptr.Duration = 1.0f;
-                splash.Ptr.BackgroundImage = Context.ResourceCache.GetResource<Texture2D>("Images/Background.png");
-                splash.Ptr.ForegroundImage = Context.ResourceCache.GetResource<Texture2D>("Images/Splash.png");
-                stateManager.EnqueueState(splash);
-            }
-
-            if (!Context.VirtualFileSystem.Exists(privacyPolicyAcceptedFileId_))
-            {
-                _stateStack.Push(new AcceptPrivacyPolicyState(this));
-            }
-            else
-            {
-                // Crate end enqueue main menu screen.
-                _mainMenuState = _mainMenuState ?? new MainMenuState(this);
-                _stateStack.Push(_mainMenuState);
-            }
-
-            base.Start(isMain);
-        }
-
-        protected override void Stop()
-        {
-            _mainMenuState?.Dispose();
-            _gameState?.Dispose();
-
-            base.Stop();
-        }
-
-        protected override void Suspend(Archive output)
-        {
-            base.Suspend(output);
-        }
-
-        protected override void Resume(Archive input, bool differentVersion)
-        {
-            base.Resume(input, differentVersion);
+            _settings?.Dispose();
+            _settings = ConfigFileContainer<GameSettings>.LoadConfig(Context);
         }
     }
 }

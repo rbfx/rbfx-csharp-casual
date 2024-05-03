@@ -44,6 +44,9 @@
 		<input type="button" class="blue-button" style="display: block" data-event-click="NewGame">
 			New game
 		</input>
+		<input type="button" class="blue-button" style="display: block"  data-event-click="Settings">
+			Settings
+		</input>
 		<input type="button" class="blue-button" style="display: block"  data-event-click="Exit">
 			Exit
 		</input>

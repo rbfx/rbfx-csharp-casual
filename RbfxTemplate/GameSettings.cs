@@ -1,4 +1,5 @@
-﻿using Urho3DNet;
+﻿using System;
+using Urho3DNet;
 
 namespace RbfxTemplate
 {
@@ -29,6 +30,11 @@ namespace RbfxTemplate
         ///     Get or set effects volume.
         /// </summary>
         public float EffectVolume { get; set; } = 1.0f;
+
+        /// <summary>
+        /// Time when privacy policy was accepted or null if it wasn't.
+        /// </summary>
+        public bool? PrivacyPolicyAccepted { get; set; }
 
         /// <summary>
         ///     Apply settings to the application global settings.

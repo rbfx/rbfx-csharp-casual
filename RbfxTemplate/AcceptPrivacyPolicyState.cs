@@ -26,6 +26,7 @@ namespace RbfxTemplate
         {
             component.BindDataModelEvent("PrivacyPolicy", OnPrivacyPolicy);
             component.BindDataModelEvent("Accept", OnAccept);
+            component.BindDataModelEvent("Reject", OnReject);
         }
 
         public void OnPrivacyPolicy(VariantList variantList)
@@ -37,6 +38,11 @@ namespace RbfxTemplate
         public void OnAccept(VariantList variantList)
         {
             Application.AcceptPrivacyPolicy();
+        }
+
+        public void OnReject(VariantList variantList)
+        {
+            Application.RejectPrivacyPolicy();
         }
 
         public void OnContinue(VariantList variantList)

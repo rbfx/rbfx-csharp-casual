@@ -39,6 +39,9 @@
 		<input type="button" class="blue-button" style="display: block" data-event-click="Accept">
 			Accept
 		</input>
+		<input type="button" class="orange-button" style="display: block" data-event-click="Reject">
+			Reject
+		</input>
 	</div>
 </body>
 

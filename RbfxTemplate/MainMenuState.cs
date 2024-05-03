@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime;
 using System.Runtime.InteropServices;
 using Urho3DNet;
 
@@ -31,6 +32,7 @@ namespace RbfxTemplate
             component.BindDataModelProperty("game_title", _ => _.Set("Awesome game"), _ => { });
             component.BindDataModelEvent("Continue", OnContinue);
             component.BindDataModelEvent("NewGame", OnNewGame);
+            component.BindDataModelEvent("Settings", OnSettings);
             component.BindDataModelEvent("Exit", OnExit);
             component.BindDataModelEvent("Discord", OnDiscord);
         }
@@ -38,6 +40,11 @@ namespace RbfxTemplate
         public void OnNewGame(VariantList variantList)
         {
             Application.ToNewGame();
+        }
+
+        public void OnSettings(VariantList variantList)
+        {
+            Application.ToSettings();
         }
 
         public void OnExit(VariantList variantList)

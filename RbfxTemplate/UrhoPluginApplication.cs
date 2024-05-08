@@ -1,4 +1,5 @@
-﻿using Urho3DNet;
+﻿using RbfxTemplate.Utils;
+using Urho3DNet;
 
 namespace RbfxTemplate
 {
@@ -140,7 +141,6 @@ namespace RbfxTemplate
         public void ContinueGame()
         {
             if (_gameState) _stateStack.Push(_gameState);
-            ;
         }
 
         public void Quit()

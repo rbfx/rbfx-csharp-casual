@@ -32,7 +32,7 @@ namespace RbfxTemplate
         {
             // Set up engine parameters
             EngineParameters[Urho3D.EpFullScreen] = false;
-            EngineParameters[Urho3D.EpWindowResizable] = true;
+            EngineParameters[Urho3D.EpWindowResizable] = false;
             EngineParameters[Urho3D.EpWindowTitle] = "RbfxTemplate";
             EngineParameters[Urho3D.EpApplicationName] = "RbfxTemplate";
             EngineParameters[Urho3D.EpOrganizationName] = "RbfxTemplate";
@@ -62,19 +62,19 @@ namespace RbfxTemplate
                         case "--opengl": EngineParameters[Urho3D.EpRenderBackend] = (int)RenderBackend.OpenGl; break;
                         case "--vulkan": EngineParameters[Urho3D.EpRenderBackend] = (int)RenderBackend.Vulkan; break;
                         case "--fullscreen":
-                            {
-                                EngineParameters[Urho3D.EpFullScreen] = true;
-                                EngineParameters[Urho3D.EpWindowResizable] = false;
-                                EngineParameters[Urho3D.EpBorderless] = true;
-                                break;
-                            }
+                        {
+                            EngineParameters[Urho3D.EpFullScreen] = true;
+                            EngineParameters[Urho3D.EpWindowResizable] = false;
+                            EngineParameters[Urho3D.EpBorderless] = true;
+                            break;
+                        }
                         case "--windowed":
-                            {
-                                EngineParameters[Urho3D.EpFullScreen] = false;
-                                EngineParameters[Urho3D.EpWindowResizable] = true;
-                                EngineParameters[Urho3D.EpBorderless] = false;
-                                break;
-                            }
+                        {
+                            EngineParameters[Urho3D.EpFullScreen] = false;
+                            EngineParameters[Urho3D.EpWindowResizable] = true;
+                            EngineParameters[Urho3D.EpBorderless] = false;
+                            break;
+                        }
                         default: Log.Warning("Unknown argument " + commandLineArgs[index]); break;
                     }
                 }

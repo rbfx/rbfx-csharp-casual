@@ -12,8 +12,6 @@ namespace RbfxTemplate
 
         private static readonly string SOUND_EFFECT = "Effect";
 
-        //static readonly string SOUND_AMBIENT = "Ambient";
-        //static readonly string SOUND_VOICE = "Voice";
         private static readonly string SOUND_MUSIC = "Music";
 
         /// <summary>

@@ -15,10 +15,12 @@ namespace RbfxTemplate
         /// </summary>
         private SharedPtr<UrhoPluginApplication> _pluginApplication;
 
+#if DEBUG
         /// <summary>
         ///     Safe pointer to debug HUD.
         /// </summary>
         private SharedPtr<DebugHud> _debugHud;
+#endif
 
         public UrhoApplication(Context context) : base(context)
         {
@@ -85,7 +87,6 @@ namespace RbfxTemplate
             }
         }
 
-
         /// <summary>
         ///     Start application.
         /// </summary>
@@ -129,8 +130,10 @@ namespace RbfxTemplate
             var logLevel = (LogLevel)args[E.LogMessage.Level].Int;
             switch (logLevel)
             {
+#if DEBUG
                 case LogLevel.LogError:
                     throw new ApplicationException(args[E.LogMessage.Message].String);
+#endif
                 default:
                     Debug.WriteLine(args[E.LogMessage.Message].String);
                     break;

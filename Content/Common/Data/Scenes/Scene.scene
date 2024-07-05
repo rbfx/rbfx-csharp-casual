@@ -8,9 +8,65 @@
 		<component _id="1" _typeName="Octree" />
 		<component _id="2" _typeName="RenderPipeline">
 			<attributes>
+				<attribute name="Render Passes" type="VariantVector">
+					<value>
+						<element type="String" value="Postprocess: Exposure" />
+						<element type="Bool" value="true" />
+						<element type="String" value="Postprocess: SSAO" />
+						<element type="Bool" value="false" />
+						<element type="String" value="Postprocess: Bloom" />
+						<element type="Bool" value="false" />
+						<element type="String" value="Postprocess: Draw Outlines" />
+						<element type="Bool" value="false" />
+						<element type="String" value="Postprocess: Tone Mapping" />
+						<element type="Bool" value="true" />
+						<element type="String" value="Postprocess: Adjust Color" />
+						<element type="Bool" value="false" />
+						<element type="String" value="Postprocess: FXAA v2" />
+						<element type="Bool" value="false" />
+						<element type="String" value="Postprocess: FXAA v3" />
+						<element type="Bool" value="true" />
+					</value>
+				</attribute>
+				<attribute name="Render Path Parameters" type="StringVariantMap">
+					<value>
+						<element key="SSAO: Near Distance" type="Float" value="1.000000" />
+						<element key="Exposure: Adapt Rate" type="Float" value="0.600000" />
+						<element key="Exposure: Min" type="Float" value="1.000000" />
+						<element key="Bloom: Max Brightness" type="Float" value="1.000000" />
+						<element key="SSAO: Normal Threshold" type="Float" value="0.200000" />
+						<element key="SSAO: Near Radius" type="Float" value="0.050000" />
+						<element key="SSAO: Strength" type="Float" value="0.700000" />
+						<element key="Adjust Color: HSVParams" type="Vector4" value="1 1 1 1" />
+						<element key="SSAO: End Fade Distance" type="Float" value="200.000000" />
+						<element key="Exposure: Automatic" type="Bool" value="false" />
+						<element key="Tone Mapping: Mode@" type="StringVector">
+							<value>
+								<element value="None" />
+								<element value="Reinhard" />
+								<element value="ReinhardWhite" />
+								<element value="Uncharted2" />
+							</value>
+						</element>
+						<element key="SSAO: Begin Fade Distance" type="Float" value="100.000000" />
+						<element key="Adjust Color: ColorOffset" type="Vector4" value="0 0 0 0" />
+						<element key="Bloom: Base Intensity" type="Float" value="1.000000" />
+						<element key="Bloom: Iteration Intensity Factor" type="Float" value="1.000000" />
+						<element key="Bloom: Min Brightness" type="Float" value="0.800000" />
+						<element key="SSAO: Depth Threshold" type="Float" value="0.100000" />
+						<element key="SSAO: Far Distance" type="Float" value="100.000000" />
+						<element key="SSAO: Downscale" type="Int" value="0" />
+						<element key="Exposure: Max" type="Float" value="3.000000" />
+						<element key="Adjust Color: ColorFilter" type="Vector4" value="1 1 1 1" />
+						<element key="SSAO: Exponent" type="Float" value="1.500000" />
+						<element key="FXAA: FXAAParams" type="Vector3" value="0.4 0.5 0.75" />
+						<element key="SSAO: Far Radius" type="Float" value="1.000000" />
+						<element key="Bloom: Num Iterations" type="Int" value="5" />
+						<element key="Tone Mapping: Mode" type="Int" value="0" />
+					</value>
+				</attribute>
 				<attribute name="Color Space" type="String" value="HDR Linear" />
 				<attribute name="PCF Kernel Size" type="Int" value="5" />
-				<attribute name="Post Process Antialiasing" type="String" value="FXAA3" />
 			</attributes>
 		</component>
 		<component _id="11" _typeName="ReflectionProbeManager" />
@@ -21,7 +77,7 @@
 				<attribute name="Type" type="String" value="Music" />
 				<attribute name="Frequency" type="Float" value="48000.000000" />
 				<attribute name="Is Playing" type="Bool" value="true" />
-				<attribute name="Play Position" type="Int" value="202423472" />
+				<attribute name="Play Position" type="Int" value="-29058144" />
 			</attributes>
 		</component>
 	</components>
@@ -73,7 +129,7 @@
 		<node _id="7">
 			<attributes>
 				<attribute name="Name" type="String" value="Main Camera" />
-				<attribute name="Position" type="Vector3" value="2.98023e-08 2 1.19209e-06" />
+				<attribute name="Position" type="Vector3" value="0 2 1.19209e-06" />
 				<attribute name="Rotation" type="Quaternion" value="0.707107 0.707107 0 0" />
 			</attributes>
 			<components>
@@ -82,12 +138,11 @@
 						<attribute name="Near Clip" type="Float" value="0.000000" />
 						<attribute name="Far Clip" type="Float" value="10.000000" />
 						<attribute name="Orthographic" type="Bool" value="true" />
-						<attribute name="Orthographic Size" type="Float" value="2.200000" />
+						<attribute name="Orthographic Size" type="Float" value="2.000000" />
 					</attributes>
 				</component>
 				<component _id="73" _typeName="CameraOperator">
 					<attributes>
-						<attribute name="Padding" type="Vector4" value="0.1 0.1 0.1 0.1" />
 						<attribute name="Track Bounding Box" type="Bool" value="true" />
 					</attributes>
 				</component>

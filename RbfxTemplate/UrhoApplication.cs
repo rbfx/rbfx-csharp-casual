@@ -8,7 +8,7 @@ namespace RbfxTemplate
     ///     This class represents an Urho3D application.
     /// </summary>
     [Preserve(AllMembers = true)]
-    public class UrhoApplication : Application
+    public partial class UrhoApplication : Application
     {
         /// <summary>
         ///     Safe pointer to settings screen.

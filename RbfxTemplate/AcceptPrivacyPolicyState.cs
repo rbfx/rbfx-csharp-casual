@@ -4,7 +4,7 @@ namespace RbfxTemplate
 {
     [ObjectFactory]
     [Preserve(AllMembers = true)]
-    public class AcceptPrivacyPolicyState : RmlUIStateBase
+    public partial class AcceptPrivacyPolicyState : RmlUIStateBase
     {
         protected readonly SharedPtr<Scene> _scene;
         private readonly Viewport _viewport;

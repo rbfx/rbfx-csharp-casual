@@ -7,7 +7,7 @@ namespace RbfxTemplate
 {
     [ObjectFactory]
     [Preserve(AllMembers = true)]
-    public class MainMenuState : RmlUIStateBase
+    public partial class MainMenuState : RmlUIStateBase
     {
         protected readonly SharedPtr<Scene> _scene;
         private readonly Viewport _viewport;

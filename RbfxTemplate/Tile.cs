@@ -4,7 +4,7 @@ namespace RbfxTemplate
 {
     [ObjectFactory(Category = "Component/Game")]
     [Preserve(AllMembers = true)]
-    public sealed class Tile : Component
+    public sealed partial class Tile : Component
     {
         [SerializeField(Mode = AttributeMode.AmDefault | AttributeMode.AmNodeid, Name = "Link")]
         private int _linkId;

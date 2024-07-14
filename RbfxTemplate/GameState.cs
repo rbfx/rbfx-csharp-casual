@@ -7,7 +7,7 @@ namespace RbfxTemplate
 {
     [ObjectFactory]
     [Preserve(AllMembers = true)]
-    public sealed class GameState : RmlUIStateBase
+    public sealed partial class GameState : RmlUIStateBase
     {
         private readonly SharedPtr<Scene> _scene;
         private readonly UrhoPluginApplication _app;

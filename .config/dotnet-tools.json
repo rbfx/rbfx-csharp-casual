@@ -3,13 +3,13 @@
   "isRoot": true,
   "tools": {
     "ezpipeline": {
-      "version": "0.0.45",
+      "version": "0.0.46",
       "commands": [
         "ezpipeline"
       ]
     },
     "unofficial.Urho3DNet.Editor": {
-      "version": "0.3.7.823",
+      "version": "0.3.7.826",
       "commands": [
         "rbfx"
       ]

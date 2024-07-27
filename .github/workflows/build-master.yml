@@ -321,7 +321,7 @@ jobs:
       if: ${{ env.STEAM_USERNAME == '' }}
       run: |
         echo "Steam user name is not set"
-        gh run cancel ${{ github.run_id }}
+        exit 0
 
     - name: Download Windows Build
       uses: robinraju/release-downloader@v1

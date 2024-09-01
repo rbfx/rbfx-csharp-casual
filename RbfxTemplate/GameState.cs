@@ -219,9 +219,9 @@ namespace RbfxTemplate
             m.SetTexture("Albedo", tex);
 
             var tile = _scene.Ptr.InstantiatePrefab(_tilePrefab);
-            var model = tile.GetComponent<StaticModel>(true);
+            var model = tile.FindComponent<StaticModel>(ComponentSearchFlag.Default);
             model.SetMaterial(m);
-            return tile.GetComponent<Tile>(true);
+            return tile.FindComponent<Tile>(ComponentSearchFlag.Default);
         }
 
         public Ray GetScreenRay(IntVector2 inputMousePosition)
@@ -235,8 +235,7 @@ namespace RbfxTemplate
             var physics = _scene.Ptr.GetComponent<PhysicsWorld>();
             physics.RaycastSingle(_raycastResult, ray, 100);
             if (_raycastResult.Body != null)
-                return _raycastResult.Body.Node.GetComponent<Tile>() ??
-                       _raycastResult.Body.Node.GetParentComponent<Tile>(true);
+                return _raycastResult.Body.Node.FindComponent<Tile>(ComponentSearchFlag.SelfOrParentRecursive);
             return null;
         }
 

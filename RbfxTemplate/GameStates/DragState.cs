@@ -58,7 +58,7 @@ namespace RbfxTemplate.GameStates
             _interactionKey = interactionKey;
             tile.LinkTo(null);
             var material = Context.ResourceCache.GetResource<Material>("Materials/White.material");
-            tile.Link.GetComponent<AnimatedModel>(true).SetMaterial(material);
+            tile.Link.FindComponent<AnimatedModel>(ComponentSearchFlag.Default | ComponentSearchFlag.Disabled).SetMaterial(material);
         }
 
         private void MoveLink(IntVector2 intVector2)

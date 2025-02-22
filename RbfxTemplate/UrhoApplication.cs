@@ -32,9 +32,10 @@ namespace RbfxTemplate
         /// </summary>
         public override void Setup()
         {
+            WindowMode windowMode = (Debugger.IsAttached) ? WindowMode.Windowed : WindowMode.Borderless;
+            SetWindowMode(windowMode);
+
             // Set up engine parameters
-            EngineParameters[Urho3D.EpFullScreen] = false; //Use !Debugger.IsAttached if you need true fullscreen in production.
-            EngineParameters[Urho3D.EpWindowResizable] = false;
             EngineParameters[Urho3D.EpWindowTitle] = "RbfxTemplate";
             EngineParameters[Urho3D.EpApplicationName] = "RbfxTemplate";
             EngineParameters[Urho3D.EpOrganizationName] = "RbfxTemplate";
@@ -63,20 +64,9 @@ namespace RbfxTemplate
                         case "--d3d12": EngineParameters[Urho3D.EpRenderBackend] = (int)RenderBackend.D3D12; break;
                         case "--opengl": EngineParameters[Urho3D.EpRenderBackend] = (int)RenderBackend.OpenGl; break;
                         case "--vulkan": EngineParameters[Urho3D.EpRenderBackend] = (int)RenderBackend.Vulkan; break;
-                        case "--fullscreen":
-                        {
-                            EngineParameters[Urho3D.EpFullScreen] = true;
-                            EngineParameters[Urho3D.EpWindowResizable] = false;
-                            EngineParameters[Urho3D.EpBorderless] = true;
-                            break;
-                        }
-                        case "--windowed":
-                        {
-                            EngineParameters[Urho3D.EpFullScreen] = false;
-                            EngineParameters[Urho3D.EpWindowResizable] = true;
-                            EngineParameters[Urho3D.EpBorderless] = false;
-                            break;
-                        }
+                        case "--fullscreen": SetWindowMode(WindowMode.Fullscreen); break;
+                        case "--windowed": SetWindowMode(WindowMode.Windowed); break;
+                        case "--borderless": SetWindowMode(WindowMode.Borderless); break;
                         default: Log.Warning("Unknown argument " + commandLineArgs[index]); break;
                     }
                 }
@@ -84,6 +74,32 @@ namespace RbfxTemplate
             catch (Exception e)
             {
                 Log.Error(e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Set window mode from <see cref="WindowMode"/> upon initalization.
+        /// </summary>
+        /// <param name="windowMode">Window mode.</param>
+        private void SetWindowMode(WindowMode windowMode)
+        {
+            switch (windowMode)
+            {
+                case WindowMode.Windowed:
+                    EngineParameters[Urho3D.EpFullScreen] = false;
+                    EngineParameters[Urho3D.EpBorderless] = false;
+                    EngineParameters[Urho3D.EpWindowResizable] = true;
+                    break;
+                case WindowMode.Fullscreen:
+                    EngineParameters[Urho3D.EpFullScreen] = true;
+                    EngineParameters[Urho3D.EpBorderless] = true;
+                    EngineParameters[Urho3D.EpWindowResizable] = false;
+                    break;
+                case WindowMode.Borderless:
+                    EngineParameters[Urho3D.EpFullScreen] = false;
+                    EngineParameters[Urho3D.EpBorderless] = true;
+                    EngineParameters[Urho3D.EpWindowResizable] = false;
+                    break;
             }
         }
 
